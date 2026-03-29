@@ -174,6 +174,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ThemeToggle } from './theme-toggle';
 import {
   BarChart3,
@@ -384,8 +385,8 @@ export function Sidebar({ isCollapsed, toggleCollapse, isOpen, setIsOpen }: Side
           <div className="flex items-center justify-between">
             {!isCollapsed && (
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 flex items-center justify-center flex-shrink-0 shadow-lg shadow-sidebar-primary/20">
-                  <Zap className="w-6 h-6 text-white" />
+                <div className="relative w-10 h-10 flex-shrink-0 flex items-center justify-center">
+                  <Image src="/logo.png" alt="Nexus Logo" fill className="object-contain" priority />
                 </div>
                 <div className="min-w-0">
                   <h1 className="text-base font-bold text-sidebar-foreground truncate">
@@ -400,8 +401,8 @@ export function Sidebar({ isCollapsed, toggleCollapse, isOpen, setIsOpen }: Side
 
             {isCollapsed && (
               <div className="w-full flex justify-center">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 flex items-center justify-center shadow-lg shadow-sidebar-primary/20">
-                  <Zap className="w-5 h-5 text-white" />
+                <div className="relative w-9 h-9">
+                  <Image src="/logo.png" alt="Nexus Logo" fill className="object-contain" priority />
                 </div>
               </div>
             )}
