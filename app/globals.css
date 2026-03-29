@@ -127,15 +127,15 @@
   --chart-4: var(--obsidian-400);
   --chart-5: var(--gold-200);
 
-  /* Sidebar — intentionally dark even in light mode */
-  --sidebar: var(--obsidian-900);
-  --sidebar-foreground: var(--obsidian-200);
-  --sidebar-primary: var(--gold-400);
-  --sidebar-primary-foreground: var(--obsidian-950);
-  --sidebar-accent: var(--obsidian-800);
-  --sidebar-accent-foreground: var(--obsidian-100);
-  --sidebar-border: var(--obsidian-700);
-  --sidebar-ring: var(--gold-400);
+  /* Sidebar — updated to respond to Light Mode seamlessly */
+  --sidebar: var(--parchment-25);
+  --sidebar-foreground: var(--obsidian-900);
+  --sidebar-primary: var(--gold-500);
+  --sidebar-primary-foreground: var(--pure-white);
+  --sidebar-accent: var(--parchment-100);
+  --sidebar-accent-foreground: var(--obsidian-950);
+  --sidebar-border: var(--parchment-300);
+  --sidebar-ring: var(--gold-500);
 
   /* Geometry */
   --radius: 0.5rem;
