@@ -1,16 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display...');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   DESIGN TOKENS — The source of absolute truth
+   TYPEFACES — Precision-cut, authority-grade
+   ============================================================ */
+/* ============================================================
+   DESIGN TOKENS — The source of truth
    ============================================================ */
 :root {
   /* --- Chromatic foundation --- */
-
-  /* Obsidian: volcanic stone, Kenyan lava rock */
+  /* Obsidian light: drawn from volcanic stone + Kenyan lava rock */
   --obsidian-950: #07080c;
   --obsidian-900: #0d0f17;
   --obsidian-850: #111420;
@@ -25,21 +27,7 @@
   --obsidian-100: #e8ebf3;
   --obsidian-50: #f4f5f9;
 
-  /* Parchment: aged ivory — light mode surfaces */
-  --parchment-950: #1a1710;
-  --parchment-900: #2e2a1e;
-  --parchment-800: #4a4535;
-  --parchment-700: #6b6450;
-  --parchment-600: #8c856e;
-  --parchment-500: #ada690;
-  --parchment-400: #c9c4b0;
-  --parchment-300: #dedad0;
-  --parchment-200: #eeece6;
-  --parchment-100: #f5f3ee;
-  --parchment-50: #faf9f6;
-  --parchment-25: #fdfcfa;
-
-  /* Savanna gold: Rift Valley at 5pm */
+  /* Savanna gold: the light over the Rift Valley at 5pm */
   --gold-950: #1a1100;
   --gold-900: #2e1e00;
   --gold-800: #4d3300;
@@ -52,7 +40,7 @@
   --gold-100: #faefc8;
   --gold-50: #fdf8eb;
 
-  /* Nairobi forest: deep canopy */
+  /* Nairobi green: deep forest, not lime */
   --forest-900: #061a0e;
   --forest-800: #0e3020;
   --forest-700: #134d33;
@@ -76,23 +64,16 @@
   --pure-white: #ffffff;
   --pure-black: #000000;
 
-  /* -------------------------------------------------------
-     LIGHT MODE — Cream linen, gold leaf, morning authority
-     A Nairobi private bank, 9am. Sun through wooden blinds,
-     fresh espresso, clean leather. Warm, precise, powerful.
-     ------------------------------------------------------- */
-
-  --background: var(--parchment-50);
-  --background-subtle: var(--parchment-100);
-  --background-accent: var(--gold-50);
+  /* --- Semantic layer (light mode) --- */
+  --background: var(--obsidian-50);
+  --background-subtle: #f0f1f7;
   --foreground: var(--obsidian-900);
   --foreground-muted: var(--obsidian-500);
   --foreground-faint: var(--obsidian-300);
 
   --surface: var(--pure-white);
-  --surface-raised: var(--parchment-25);
-  --surface-overlay: rgba(253, 252, 250, 0.94);
-  --surface-sunken: var(--parchment-100);
+  --surface-raised: var(--pure-white);
+  --surface-overlay: rgba(255, 255, 255, 0.92);
 
   --card: var(--pure-white);
   --card-foreground: var(--obsidian-900);
@@ -105,72 +86,67 @@
   --secondary: var(--gold-500);
   --secondary-foreground: var(--pure-white);
 
-  --accent: var(--forest-600);
+  --accent: var(--forest-500);
   --accent-foreground: var(--pure-white);
 
-  --muted: var(--parchment-100);
+  --muted: var(--obsidian-50);
   --muted-foreground: var(--obsidian-400);
 
   --destructive: var(--signal-500);
   --destructive-foreground: var(--pure-white);
 
-  --border: var(--parchment-200);
-  --border-strong: var(--parchment-300);
-  --border-accent: rgba(201, 138, 0, 0.25);
+  --border: var(--obsidian-100);
+  --border-strong: var(--obsidian-200);
   --input: var(--pure-white);
-  --ring: var(--gold-500);
+  --ring: var(--obsidian-900);
 
-  /* Chart */
+  /* Chart palette */
   --chart-1: var(--obsidian-800);
   --chart-2: var(--gold-400);
-  --chart-3: var(--forest-500);
+  --chart-3: var(--forest-400);
   --chart-4: var(--obsidian-400);
   --chart-5: var(--gold-200);
 
-  /* Sidebar — intentionally dark even in light mode */
+  /* Sidebar */
   --sidebar: var(--obsidian-900);
-  --sidebar-foreground: var(--obsidian-200);
+  --sidebar-foreground: var(--obsidian-100);
   --sidebar-primary: var(--gold-400);
   --sidebar-primary-foreground: var(--obsidian-950);
-  --sidebar-accent: var(--obsidian-800);
+  --sidebar-accent: var(--obsidian-750);
   --sidebar-accent-foreground: var(--obsidian-100);
   --sidebar-border: var(--obsidian-700);
   --sidebar-ring: var(--gold-400);
 
-  /* Geometry */
+  /* --- Geometry --- */
   --radius: 0.5rem;
-  --radius-xs: 0.1875rem;
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
   --radius-lg: 0.625rem;
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
-  --radius-full: 9999px;
 
-  /* Elevation shadows — light: warm golden-tinted */
-  --shadow-xs: 0 1px 2px rgba(90, 70, 20, 0.06);
-  --shadow-sm: 0 1px 3px rgba(90, 70, 20, 0.08), 0 1px 2px rgba(90, 70, 20, 0.04);
-  --shadow-md: 0 4px 12px rgba(90, 70, 20, 0.09), 0 2px 4px rgba(90, 70, 20, 0.05);
-  --shadow-lg: 0 8px 24px rgba(90, 70, 20, 0.10), 0 4px 8px rgba(90, 70, 20, 0.06);
-  --shadow-xl: 0 16px 48px rgba(90, 70, 20, 0.12), 0 8px 16px rgba(90, 70, 20, 0.07);
-  --shadow-gold: 0 4px 20px rgba(201, 138, 0, 0.18), 0 1px 4px rgba(201, 138, 0, 0.10);
-  --shadow-inset: inset 0 1px 3px rgba(90, 70, 20, 0.06);
+  /* --- Elevation shadows (light) --- */
+  --shadow-xs: 0 1px 2px rgba(13, 15, 23, 0.06);
+  --shadow-sm: 0 1px 3px rgba(13, 15, 23, 0.08), 0 1px 2px rgba(13, 15, 23, 0.04);
+  --shadow-md: 0 4px 12px rgba(13, 15, 23, 0.08), 0 2px 4px rgba(13, 15, 23, 0.04);
+  --shadow-lg: 0 8px 24px rgba(13, 15, 23, 0.10), 0 4px 8px rgba(13, 15, 23, 0.06);
+  --shadow-xl: 0 16px 48px rgba(13, 15, 23, 0.12), 0 8px 16px rgba(13, 15, 23, 0.06);
 
-  /* Motion */
+  /* --- Motion --- */
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 350ms;
   --duration-enter: 500ms;
 
-  /* Typography */
+  /* --- Typography scale --- */
   --font-sans: 'DM Sans', system-ui, sans-serif;
   --font-serif: 'DM Serif Display', Georgia, serif;
   --font-mono: 'DM Mono', 'Fira Code', monospace;
 
+  /* Fine-tuned letter spacing */
   --tracking-tightest: -0.04em;
   --tracking-tighter: -0.025em;
   --tracking-tight: -0.015em;
@@ -178,36 +154,22 @@
   --tracking-wide: 0.04em;
   --tracking-wider: 0.08em;
   --tracking-widest: 0.12em;
-
-  /* Decorative gold rule — light: warm and visible */
-  --rule-gold: linear-gradient(90deg,
-      transparent 0%,
-      var(--gold-300) 20%,
-      var(--gold-400) 50%,
-      var(--gold-300) 80%,
-      transparent 100%);
-
-  --noise-opacity: 0.022;
-  --noise-blend: multiply;
 }
 
 /* ============================================================
-   DARK THEME — Polished obsidian, ember glow, starless sky
-   A Nairobi penthouse at midnight. One amber lamp. The city
-   glittering below. Everything precise, nothing wasted.
+   DARK THEME — The primary premium experience
+   This is where the design truly lives
    ============================================================ */
 .dark {
   --background: var(--obsidian-900);
   --background-subtle: var(--obsidian-850);
-  --background-accent: rgba(201, 138, 0, 0.04);
   --foreground: var(--obsidian-50);
   --foreground-muted: var(--obsidian-300);
   --foreground-faint: var(--obsidian-500);
 
   --surface: var(--obsidian-850);
   --surface-raised: var(--obsidian-800);
-  --surface-overlay: rgba(11, 13, 20, 0.96);
-  --surface-sunken: var(--obsidian-950);
+  --surface-overlay: rgba(17, 20, 32, 0.95);
 
   --card: var(--obsidian-850);
   --card-foreground: var(--obsidian-50);
@@ -230,8 +192,7 @@
   --destructive-foreground: var(--obsidian-950);
 
   --border: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.13);
-  --border-accent: rgba(223, 168, 50, 0.20);
+  --border-strong: rgba(255, 255, 255, 0.12);
   --input: var(--obsidian-800);
   --ring: var(--gold-400);
 
@@ -242,7 +203,7 @@
   --chart-5: var(--gold-500);
 
   --sidebar: var(--obsidian-950);
-  --sidebar-foreground: var(--obsidian-300);
+  --sidebar-foreground: var(--obsidian-200);
   --sidebar-primary: var(--gold-400);
   --sidebar-primary-foreground: var(--obsidian-950);
   --sidebar-accent: var(--obsidian-850);
@@ -250,25 +211,11 @@
   --sidebar-border: rgba(255, 255, 255, 0.05);
   --sidebar-ring: var(--gold-400);
 
-  /* Shadows — dark: deep, cinematic */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.30);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.40), 0 1px 2px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.50), 0 2px 4px rgba(0, 0, 0, 0.30);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.60), 0 4px 8px rgba(0, 0, 0, 0.35);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.70), 0 8px 16px rgba(0, 0, 0, 0.40);
-  --shadow-gold: 0 4px 20px rgba(223, 168, 50, 0.22), 0 1px 4px rgba(223, 168, 50, 0.12);
-  --shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.35);
-
-  /* Gold rule — dark: ember, more atmospheric */
-  --rule-gold: linear-gradient(90deg,
-      transparent 0%,
-      rgba(223, 168, 50, 0.15) 20%,
-      rgba(223, 168, 50, 0.45) 50%,
-      rgba(223, 168, 50, 0.15) 80%,
-      transparent 100%);
-
-  --noise-opacity: 0.018;
-  --noise-blend: overlay;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.20);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.40), 0 2px 4px rgba(0, 0, 0, 0.20);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.50), 0 4px 8px rgba(0, 0, 0, 0.25);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.60), 0 8px 16px rgba(0, 0, 0, 0.30);
 }
 
 /* ============================================================
@@ -303,7 +250,6 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-xs: var(--radius-xs);
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
@@ -320,10 +266,11 @@
 }
 
 /* ============================================================
-   BASE LAYER
+   BASE LAYER — The bones of everything
    ============================================================ */
 @layer base {
 
+  /* --- Global reset refinements --- */
   *,
   *::before,
   *::after {
@@ -337,11 +284,6 @@
     text-rendering: optimizeLegibility;
     font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1, 'ss02' 1;
     scroll-behavior: smooth;
-    color-scheme: light;
-  }
-
-  html.dark {
-    color-scheme: dark;
   }
 
   body {
@@ -354,48 +296,13 @@
     min-height: 100dvh;
   }
 
-  /* Light mode: soft warm ambient glow from top */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(ellipse 90% 50% at 50% -5%,
-        rgba(201, 138, 0, 0.05) 0%,
-        transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Dark mode: deep ember glow from top + grain */
-  .dark body::after {
-    background: radial-gradient(ellipse 80% 50% at 50% -5%,
-        rgba(223, 168, 50, 0.07) 0%,
-        transparent 70%);
-  }
-
-  .dark body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-    opacity: var(--noise-opacity);
-    pointer-events: none;
-    z-index: 9999;
-    mix-blend-mode: var(--noise-blend);
-  }
-
-  /* Selection */
+  /* --- Premium selection colour --- */
   ::selection {
-    background: var(--gold-300);
+    background: var(--gold-400);
     color: var(--obsidian-950);
   }
 
-  .dark ::selection {
-    background: var(--gold-500);
-    color: var(--obsidian-950);
-  }
-
-  /* Scrollbar */
+  /* --- Scrollbar — thin and refined --- */
   ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -406,7 +313,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--parchment-300);
+    background: var(--obsidian-300);
     border-radius: 100px;
   }
 
@@ -418,7 +325,7 @@
     background: var(--gold-400);
   }
 
-  /* Focus ring */
+  /* --- Focus ring — precise, not chunky --- */
   :focus-visible {
     outline: 1.5px solid var(--ring);
     outline-offset: 2px;
@@ -426,8 +333,9 @@
   }
 
   /* ======================================
-     TYPOGRAPHY
+     TYPOGRAPHY — The voice of the brand
      ====================================== */
+
   h1,
   h2,
   h3,
@@ -488,6 +396,7 @@
     line-height: 1.65;
   }
 
+  /* Eyebrow / overline text */
   .text-overline {
     font-family: var(--font-sans);
     font-size: 0.6875rem;
@@ -516,14 +425,9 @@
     padding: 0.125em 0.4em;
     border-radius: var(--radius-sm);
     font-weight: 500;
-    border: 1px solid var(--border);
   }
 
-  .dark code {
-    background: rgba(223, 168, 50, 0.08);
-    border-color: rgba(223, 168, 50, 0.15);
-  }
-
+  /* Tabular numbers for financial data — critical for an ERP */
   .tabular,
   .font-mono,
   td.numeric,
@@ -533,19 +437,22 @@
     letter-spacing: 0;
   }
 
+  /* --- Horizontal rules — architectural, not decorative --- */
   hr {
     border: none;
     height: 1px;
-    background: var(--rule-gold);
+    background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
     margin: 2rem 0;
   }
 
+  /* --- Links --- */
   a {
     color: inherit;
     text-decoration: none;
     transition: color var(--duration-fast) var(--ease-out-quart);
   }
 
+  /* --- Table base — ERP tables need to be perfect --- */
   table {
     width: 100%;
     border-collapse: collapse;
@@ -582,6 +489,7 @@
     vertical-align: middle;
   }
 
+  /* --- Input base --- */
   input,
   textarea,
   select {
@@ -606,14 +514,13 @@
 }
 
 /* ============================================================
-   COMPONENTS
+   COMPONENTS — The arsenal of premium UI
    ============================================================ */
 @layer components {
 
   /* ==========================================
      CARD SYSTEM
-     Light: white card, warm golden shadow
-     Dark: obsidian slab, ember shimmer on hover
+     The workhorse of the ERP interface
      ========================================== */
 
   .card-premium {
@@ -630,74 +537,32 @@
       transform var(--duration-base) var(--ease-out-quart);
   }
 
-  /* Gold hairline at top — appears on hover */
+  /* The signature: a hairline gold top-edge on hover */
   .card-premium::before {
     content: '';
     position: absolute;
-    inset-inline: 0;
+    inset: 0;
     top: 0;
     height: 1px;
-    background: linear-gradient(90deg,
-        transparent 10%,
-        var(--gold-300) 40%,
-        var(--gold-400) 50%,
-        var(--gold-300) 60%,
-        transparent 90%);
+    background: linear-gradient(90deg, transparent 10%, var(--gold-400) 50%, transparent 90%);
     opacity: 0;
     transition: opacity var(--duration-base) var(--ease-out-quart);
     z-index: 1;
     pointer-events: none;
   }
 
-  /* Warm inner glow — light mode only */
-  .card-premium::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(201, 138, 0, 0.025) 0%, transparent 40%);
-    opacity: 0;
-    transition: opacity var(--duration-base) var(--ease-out-quart);
-    pointer-events: none;
-    z-index: 0;
-  }
-
   .card-premium:hover {
     box-shadow: var(--shadow-md);
-    border-color: var(--border-accent);
-    transform: translateY(-1px);
+    border-color: var(--border-strong);
   }
 
-  .card-premium:hover::before,
-  .card-premium:hover::after {
+  .card-premium:hover::before {
     opacity: 1;
   }
 
-  /* Dark: obsidian surface, deeper glow */
-  .dark .card-premium {
-    background: var(--obsidian-850);
-    border-color: rgba(255, 255, 255, 0.07);
-  }
-
-  .dark .card-premium::before {
-    background: linear-gradient(90deg,
-        transparent 10%,
-        rgba(223, 168, 50, 0.20) 40%,
-        rgba(223, 168, 50, 0.55) 50%,
-        rgba(223, 168, 50, 0.20) 60%,
-        transparent 90%);
-  }
-
-  .dark .card-premium::after {
-    background: linear-gradient(180deg, rgba(223, 168, 50, 0.05) 0%, transparent 40%);
-  }
-
-  .dark .card-premium:hover {
-    border-color: rgba(223, 168, 50, 0.20);
-    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(223, 168, 50, 0.08);
-  }
-
-  /* Stat card variant */
+  /* Stat card variant — for KPI numbers */
   .card-stat {
+    /* Inlined from .card-premium */
     background: var(--card);
     color: var(--card-foreground);
     border-radius: var(--radius-lg);
@@ -713,11 +578,6 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-  }
-
-  .dark .card-stat {
-    background: var(--obsidian-850);
-    border-color: rgba(255, 255, 255, 0.07);
   }
 
   .card-stat .stat-label {
@@ -746,18 +606,10 @@
   }
 
   .card-stat .stat-delta.positive {
-    color: var(--forest-600);
-  }
-
-  .dark .card-stat .stat-delta.positive {
-    color: var(--forest-300);
+    color: var(--forest-400);
   }
 
   .card-stat .stat-delta.negative {
-    color: var(--signal-500);
-  }
-
-  .dark .card-stat .stat-delta.negative {
     color: var(--signal-400);
   }
 
@@ -782,20 +634,20 @@
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     transition:
       transform var(--duration-fast) var(--ease-spring),
       box-shadow var(--duration-base) var(--ease-out-quart),
       background var(--duration-fast) var(--ease-out-quart);
   }
 
+  /* Shimmer on hover */
   .btn-primary::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.10) 50%, transparent 60%);
+    background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.12) 50%, transparent 60%);
     transform: translateX(-100%);
-    transition: transform 0.45s var(--ease-out-expo);
+    transition: transform 0.4s var(--ease-out-expo);
     pointer-events: none;
   }
 
@@ -813,8 +665,9 @@
     box-shadow: var(--shadow-xs);
   }
 
-  /* Gold CTA — the crown jewel */
+  /* Gold accent button — for primary CTAs */
   .btn-gold {
+    /* Inlined from .btn-primary */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -822,35 +675,28 @@
     padding: 0.625rem 1.25rem;
     font-family: var(--font-sans);
     font-size: 0.875rem;
-    font-weight: 600;
     letter-spacing: 0.01em;
     border-radius: var(--radius-md);
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    background: var(--gold-500);
-    color: var(--obsidian-950);
-    border: 1px solid var(--gold-400);
-    box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.18);
     transition:
       transform var(--duration-fast) var(--ease-spring),
       box-shadow var(--duration-base) var(--ease-out-quart),
       background var(--duration-fast) var(--ease-out-quart);
-  }
-
-  .dark .btn-gold {
-    background: var(--gold-400);
-    border-color: var(--gold-300);
-    box-shadow: 0 4px 20px rgba(223, 168, 50, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.20);
+    background: var(--gold-500);
+    color: var(--obsidian-950);
+    border: 1px solid var(--gold-400);
+    font-weight: 600;
   }
 
   .btn-gold::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.22) 50%, transparent 60%);
+    background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.12) 50%, transparent 60%);
     transform: translateX(-100%);
-    transition: transform 0.45s var(--ease-out-expo);
+    transition: transform 0.4s var(--ease-out-expo);
     pointer-events: none;
   }
 
@@ -860,13 +706,8 @@
 
   .btn-gold:hover {
     background: var(--gold-400);
-    box-shadow: 0 6px 28px rgba(201, 138, 0, 0.38);
+    box-shadow: 0 4px 16px rgba(201, 138, 0, 0.30);
     transform: translateY(-1px);
-  }
-
-  .dark .btn-gold:hover {
-    background: var(--gold-300);
-    box-shadow: 0 6px 28px rgba(223, 168, 50, 0.42);
   }
 
   .btn-gold:active {
@@ -891,14 +732,12 @@
     transition:
       background var(--duration-fast) var(--ease-out-quart),
       border-color var(--duration-fast) var(--ease-out-quart),
-      box-shadow var(--duration-fast) var(--ease-out-quart),
       transform var(--duration-fast) var(--ease-spring);
   }
 
   .btn-secondary:hover {
     background: var(--muted);
-    border-color: var(--border-accent);
-    box-shadow: var(--shadow-xs);
+    border-color: var(--border);
     transform: translateY(-1px);
   }
 
@@ -906,6 +745,7 @@
     transform: translateY(0);
   }
 
+  /* btn-outline is identical to btn-secondary */
   .btn-outline {
     display: inline-flex;
     align-items: center;
@@ -928,7 +768,7 @@
 
   .btn-outline:hover {
     background: var(--muted);
-    border-color: var(--border-accent);
+    border-color: var(--border);
     transform: translateY(-1px);
   }
 
@@ -959,6 +799,7 @@
     color: var(--foreground);
   }
 
+  /* Icon button */
   .btn-icon {
     display: inline-flex;
     align-items: center;
@@ -967,27 +808,22 @@
     height: 2.25rem;
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
-    background: var(--surface);
+    background: transparent;
     color: var(--muted-foreground);
     cursor: pointer;
     transition:
       background var(--duration-fast) var(--ease-out-quart),
       color var(--duration-fast) var(--ease-out-quart),
-      border-color var(--duration-fast) var(--ease-out-quart),
-      box-shadow var(--duration-fast) var(--ease-out-quart);
-  }
-
-  .dark .btn-icon {
-    background: var(--obsidian-800);
+      border-color var(--duration-fast) var(--ease-out-quart);
   }
 
   .btn-icon:hover {
     background: var(--muted);
     color: var(--foreground);
-    border-color: var(--border-accent);
-    box-shadow: var(--shadow-xs);
+    border-color: var(--border-strong);
   }
 
+  /* Sizes */
   .btn-sm {
     padding: 0.4rem 0.875rem;
     font-size: 0.8125rem;
@@ -999,7 +835,7 @@
   }
 
   /* ==========================================
-     BADGE SYSTEM
+     BADGE SYSTEM — Status indicators
      ========================================== */
 
   .badge {
@@ -1026,6 +862,7 @@
   }
 
   .badge-success {
+    /* Inlined from .badge */
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -1037,15 +874,9 @@
     text-transform: uppercase;
     line-height: 1;
     white-space: nowrap;
-    background: color-mix(in srgb, var(--forest-500) 10%, transparent);
-    color: var(--forest-600);
-    border: 1px solid color-mix(in srgb, var(--forest-500) 22%, transparent);
-  }
-
-  .dark .badge-success {
     background: color-mix(in srgb, var(--forest-400) 12%, transparent);
-    color: var(--forest-300);
-    border-color: color-mix(in srgb, var(--forest-400) 22%, transparent);
+    color: var(--forest-400);
+    border: 1px solid color-mix(in srgb, var(--forest-400) 20%, transparent);
   }
 
   .badge-success::before {
@@ -1069,15 +900,9 @@
     text-transform: uppercase;
     line-height: 1;
     white-space: nowrap;
-    background: color-mix(in srgb, var(--gold-500) 10%, transparent);
-    color: var(--gold-700);
-    border: 1px solid color-mix(in srgb, var(--gold-500) 22%, transparent);
-  }
-
-  .dark .badge-warning {
     background: color-mix(in srgb, var(--gold-400) 12%, transparent);
-    color: var(--gold-300);
-    border-color: color-mix(in srgb, var(--gold-400) 22%, transparent);
+    color: var(--gold-500);
+    border: 1px solid color-mix(in srgb, var(--gold-400) 20%, transparent);
   }
 
   .badge-warning::before {
@@ -1101,15 +926,9 @@
     text-transform: uppercase;
     line-height: 1;
     white-space: nowrap;
-    background: color-mix(in srgb, var(--signal-500) 10%, transparent);
-    color: var(--signal-500);
-    border: 1px solid color-mix(in srgb, var(--signal-500) 22%, transparent);
-  }
-
-  .dark .badge-danger {
     background: color-mix(in srgb, var(--signal-400) 12%, transparent);
     color: var(--signal-400);
-    border-color: color-mix(in srgb, var(--signal-400) 22%, transparent);
+    border: 1px solid color-mix(in srgb, var(--signal-400) 20%, transparent);
   }
 
   .badge-danger::before {
@@ -1180,14 +999,13 @@
   .input-field {
     width: 100%;
     padding: 0.625rem 0.875rem;
-    background: var(--pure-white);
+    background: var(--input);
     color: var(--foreground);
-    border: 1px solid var(--parchment-300);
+    border: 1px solid var(--border);
     border-radius: var(--radius-md);
     font-family: var(--font-sans);
     font-size: 0.9375rem;
     line-height: 1.5;
-    box-shadow: inset 0 1px 3px rgba(90, 70, 20, 0.05);
     transition:
       border-color var(--duration-fast) var(--ease-out-quart),
       box-shadow var(--duration-fast) var(--ease-out-quart),
@@ -1195,38 +1013,20 @@
     -webkit-appearance: none;
   }
 
-  .dark .input-field {
-    background: var(--obsidian-800);
-    border-color: rgba(255, 255, 255, 0.09);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
-  }
-
   .input-field::placeholder {
     color: var(--muted-foreground);
-    opacity: 0.6;
+    opacity: 0.7;
   }
 
   .input-field:hover {
     border-color: var(--border-strong);
   }
 
-  .dark .input-field:hover {
-    border-color: rgba(255, 255, 255, 0.15);
-  }
-
   .input-field:focus {
     border-color: var(--secondary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary) 15%, transparent),
-      inset 0 1px 3px rgba(90, 70, 20, 0.04);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary) 15%, transparent);
     outline: none;
     background: var(--surface-raised);
-  }
-
-  .dark .input-field:focus {
-    border-color: var(--gold-400);
-    box-shadow: 0 0 0 3px rgba(223, 168, 50, 0.12),
-      inset 0 1px 3px rgba(0, 0, 0, 0.30);
-    background: var(--obsidian-750);
   }
 
   .input-label {
@@ -1239,19 +1039,13 @@
   }
 
   /* ==========================================
-     DATA TABLE
+     DATA TABLE — The crown jewel of an ERP
      ========================================== */
 
   .data-table-container {
     overflow-x: auto;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .dark .data-table-container {
-    border-color: rgba(255, 255, 255, 0.07);
-    box-shadow: var(--shadow-md);
   }
 
   .data-table {
@@ -1261,14 +1055,10 @@
   }
 
   .data-table thead {
-    background: var(--parchment-100);
+    background: var(--muted);
     position: sticky;
     top: 0;
     z-index: 2;
-  }
-
-  .dark .data-table thead {
-    background: var(--obsidian-800);
   }
 
   .data-table thead th {
@@ -1306,20 +1096,17 @@
   }
 
   .data-table tbody tr:hover td {
-    background: color-mix(in srgb, var(--gold-400) 5%, var(--parchment-100));
+    background: color-mix(in srgb, var(--secondary) 5%, var(--muted));
   }
 
-  .dark .data-table tbody tr:hover td {
-    background: color-mix(in srgb, var(--gold-400) 5%, var(--obsidian-800));
-  }
-
+  /* Row selection highlight */
   .data-table tbody tr.selected td {
     background: color-mix(in srgb, var(--secondary) 8%, transparent);
     border-color: color-mix(in srgb, var(--secondary) 20%, transparent);
   }
 
   /* ==========================================
-     SIDEBAR
+     SIDEBAR COMPONENTS
      ========================================== */
 
   .sidebar-nav-item {
@@ -1335,7 +1122,7 @@
     transition:
       background var(--duration-fast) var(--ease-out-quart),
       color var(--duration-fast) var(--ease-out-quart),
-      padding-left var(--duration-base) var(--ease-out-expo);
+      padding-left var(--duration-fast) var(--ease-out-quart);
     cursor: pointer;
     position: relative;
   }
@@ -1346,6 +1133,7 @@
     padding-left: 1.125rem;
   }
 
+  /* The gold left-rail on active items */
   .sidebar-nav-item.active {
     background: var(--sidebar-accent);
     color: var(--sidebar-primary);
@@ -1353,7 +1141,6 @@
     padding-left: 1.125rem;
   }
 
-  /* Gold left rail — glows in both modes */
   .sidebar-nav-item.active::before {
     content: '';
     position: absolute;
@@ -1363,7 +1150,6 @@
     width: 2px;
     background: var(--sidebar-primary);
     border-radius: 0 2px 2px 0;
-    box-shadow: 0 0 8px rgba(223, 168, 50, 0.55);
   }
 
   /* ==========================================
@@ -1392,16 +1178,10 @@
   }
 
   /* ==========================================
-     DIVIDERS
+     DIVIDERS & SEPARATORS
      ========================================== */
 
   .divider {
-    height: 1px;
-    background: var(--rule-gold);
-    margin: 1.5rem 0;
-  }
-
-  .divider-plain {
     height: 1px;
     background: var(--border);
     margin: 1.5rem 0;
@@ -1427,7 +1207,7 @@
   }
 
   /* ==========================================
-     SKELETON
+     LOADING & SKELETON
      ========================================== */
 
   @keyframes skeleton-shimmer {
@@ -1442,24 +1222,16 @@
 
   .skeleton {
     background: linear-gradient(90deg,
-        var(--parchment-100) 25%,
-        var(--parchment-200) 50%,
-        var(--parchment-100) 75%);
+        var(--muted) 25%,
+        color-mix(in srgb, var(--muted) 50%, var(--border)) 50%,
+        var(--muted) 75%);
     background-size: 800px 100%;
     animation: skeleton-shimmer 1.6s ease-in-out infinite;
     border-radius: var(--radius-sm);
   }
 
-  .dark .skeleton {
-    background: linear-gradient(90deg,
-        var(--obsidian-800) 25%,
-        var(--obsidian-700) 50%,
-        var(--obsidian-800) 75%);
-    background-size: 800px 100%;
-  }
-
   /* ==========================================
-     TOAST
+     TOAST / NOTIFICATION
      ========================================== */
 
   .toast {
@@ -1467,18 +1239,12 @@
     align-items: flex-start;
     gap: 0.75rem;
     padding: 1rem 1.25rem;
-    background: var(--pure-white);
-    border: 1px solid var(--parchment-200);
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     font-size: 0.875rem;
     max-width: 22rem;
-  }
-
-  .dark .toast {
-    background: var(--obsidian-800);
-    border-color: rgba(255, 255, 255, 0.09);
-    box-shadow: var(--shadow-xl);
   }
 
   .toast-success {
@@ -1507,17 +1273,17 @@
     box-shadow: var(--shadow-lg);
     pointer-events: none;
     white-space: nowrap;
-    border: 1px solid var(--obsidian-700);
   }
 
   .dark .tooltip {
-    background: var(--obsidian-750);
-    border-color: var(--obsidian-600);
-    box-shadow: var(--shadow-xl);
+    background: var(--obsidian-700);
+    border: 1px solid var(--obsidian-600);
   }
 
   /* ==========================================
-     FINANCIAL AMOUNTS
+     FINANCIAL AMOUNT DISPLAY
+     Critical for an ERP — numbers must be
+     immediately scannable
      ========================================== */
 
   .amount {
@@ -1528,18 +1294,10 @@
   }
 
   .amount-positive {
-    color: var(--forest-600);
-  }
-
-  .dark .amount-positive {
-    color: var(--forest-300);
+    color: var(--forest-400);
   }
 
   .amount-negative {
-    color: var(--signal-500);
-  }
-
-  .dark .amount-negative {
     color: var(--signal-400);
   }
 
@@ -1548,7 +1306,9 @@
   }
 
   .amount-large {
+    /* Inlined from .amount */
     font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
     font-weight: 500;
     font-family: var(--font-serif);
     font-size: 1.75rem;
@@ -1556,6 +1316,7 @@
     letter-spacing: var(--tracking-tighter);
   }
 
+  /* Currency prefix */
   .amount-kes::before {
     content: 'KES ';
     font-size: 0.75em;
@@ -1567,36 +1328,24 @@
   }
 
   /* ==========================================
-     METRIC BARS
+     PROGRESS / METRIC BARS
      ========================================== */
 
   .metric-bar-track {
     height: 4px;
-    background: var(--parchment-200);
+    background: var(--muted);
     border-radius: 100px;
     overflow: hidden;
-  }
-
-  .dark .metric-bar-track {
-    background: var(--obsidian-700);
   }
 
   .metric-bar-fill {
     height: 100%;
     border-radius: 100px;
-    background: linear-gradient(90deg, var(--gold-600), var(--gold-300));
+    background: linear-gradient(90deg, var(--secondary), var(--gold-300));
     transition: width 0.8s var(--ease-out-expo);
   }
 
-  .dark .metric-bar-fill {
-    background: linear-gradient(90deg, var(--gold-500), var(--gold-300));
-  }
-
   .metric-bar-fill.success {
-    background: linear-gradient(90deg, var(--forest-600), var(--forest-400));
-  }
-
-  .dark .metric-bar-fill.success {
     background: linear-gradient(90deg, var(--forest-500), var(--forest-300));
   }
 
@@ -1605,15 +1354,15 @@
   }
 
   /* ==========================================
-     MODAL
+     MODAL / DIALOG
      ========================================== */
 
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(30, 25, 15, 0.48);
-    backdrop-filter: blur(6px) saturate(1.3);
-    -webkit-backdrop-filter: blur(6px) saturate(1.3);
+    background: rgba(7, 8, 12, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     z-index: 50;
     display: flex;
     align-items: center;
@@ -1621,14 +1370,9 @@
     padding: 1rem;
   }
 
-  .dark .modal-overlay {
-    background: rgba(4, 5, 9, 0.74);
-    backdrop-filter: blur(8px) saturate(1.5);
-  }
-
   .modal-content {
-    background: var(--pure-white);
-    border: 1px solid var(--parchment-200);
+    background: var(--card);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-xl);
     width: 100%;
@@ -1638,15 +1382,10 @@
     position: relative;
   }
 
-  .dark .modal-content {
-    background: var(--obsidian-850);
-    border-color: rgba(255, 255, 255, 0.10);
-    box-shadow: var(--shadow-xl), 0 0 0 1px rgba(223, 168, 50, 0.06);
-  }
-
   .modal-header {
-    padding: 1.5rem 1.5rem 1rem;
+    padding: 1.5rem 1.5rem 0;
     border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
   }
 
   .modal-body {
@@ -1675,7 +1414,8 @@
     border: 1px dashed var(--border-strong);
     border-radius: var(--radius-xl);
     background: repeating-linear-gradient(45deg,
-        transparent, transparent 10px,
+        transparent,
+        transparent 10px,
         color-mix(in srgb, var(--border) 30%, transparent) 10px,
         color-mix(in srgb, var(--border) 30%, transparent) 11px);
   }
@@ -1685,7 +1425,7 @@
     height: 3rem;
     color: var(--muted-foreground);
     margin-bottom: 1.25rem;
-    opacity: 0.4;
+    opacity: 0.5;
   }
 
   .empty-state-title {
@@ -1704,7 +1444,7 @@
   }
 
   /* ==========================================
-     SECTION HEADERS
+     SECTION HEADERS — Inside cards
      ========================================== */
 
   .section-header {
@@ -1739,6 +1479,7 @@
   }
 
   .icon-container-sm {
+    /* Inlined from .icon-container */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1749,6 +1490,7 @@
   }
 
   .icon-container-lg {
+    /* Inlined from .icon-container */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1758,42 +1500,23 @@
     border-radius: var(--radius-lg);
   }
 
+  /* Colour variants */
   .icon-primary {
-    background: color-mix(in srgb, var(--obsidian-900) 8%, transparent);
-    color: var(--obsidian-800);
-  }
-
-  .dark .icon-primary {
-    background: color-mix(in srgb, var(--obsidian-100) 8%, transparent);
-    color: var(--obsidian-100);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--primary);
   }
 
   .icon-gold {
-    background: color-mix(in srgb, var(--gold-500) 12%, transparent);
-    color: var(--gold-600);
-  }
-
-  .dark .icon-gold {
-    background: color-mix(in srgb, var(--gold-400) 12%, transparent);
-    color: var(--gold-300);
+    background: color-mix(in srgb, var(--secondary) 12%, transparent);
+    color: var(--secondary);
   }
 
   .icon-success {
-    background: color-mix(in srgb, var(--forest-500) 10%, transparent);
-    color: var(--forest-600);
-  }
-
-  .dark .icon-success {
     background: color-mix(in srgb, var(--forest-400) 12%, transparent);
-    color: var(--forest-300);
+    color: var(--forest-400);
   }
 
   .icon-danger {
-    background: color-mix(in srgb, var(--signal-500) 10%, transparent);
-    color: var(--signal-500);
-  }
-
-  .dark .icon-danger {
     background: color-mix(in srgb, var(--signal-400) 12%, transparent);
     color: var(--signal-400);
   }
@@ -1805,33 +1528,21 @@
 }
 
 /* ============================================================
-   UTILITIES
+   UTILITIES — Surgical one-purpose classes
    ============================================================ */
 @layer utilities {
 
-  /* Glass — light: frosted cream / dark: frosted obsidian */
+  /* Glass morphism — for overlays */
   .glass {
     background: var(--surface-overlay);
-    backdrop-filter: blur(14px) saturate(1.6);
-    -webkit-backdrop-filter: blur(14px) saturate(1.6);
+    backdrop-filter: blur(12px) saturate(1.4);
+    -webkit-backdrop-filter: blur(12px) saturate(1.4);
     border: 1px solid var(--border);
   }
 
-  .dark .glass {
-    background: rgba(17, 20, 32, 0.82);
-    border-color: rgba(255, 255, 255, 0.07);
-  }
-
-  /* Gold gradient text */
+  /* Premium gradient text — for display moments */
   .text-gradient-gold {
-    background: linear-gradient(135deg, var(--gold-600) 0%, var(--gold-400) 50%, var(--gold-500) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .dark .text-gradient-gold {
-    background: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-200) 50%, var(--gold-300) 100%);
+    background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-300) 50%, var(--gold-400) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1844,12 +1555,6 @@
     background-clip: text;
   }
 
-  /* Gold surface tint */
-  .surface-gold {
-    background: var(--background-accent);
-    border: 1px solid var(--border-accent);
-  }
-
   /* Truncation */
   .truncate-2 {
     display: -webkit-box;
@@ -1858,33 +1563,28 @@
     overflow: hidden;
   }
 
-  /* Fade */
+  /* Fade edges for scrollable content */
   .fade-right {
     mask-image: linear-gradient(to right, black 85%, transparent 100%);
     -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
   }
 
-  /* Tabular nums */
+  /* Number animation helper */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
     font-feature-settings: 'tnum' 1;
   }
-
-  /* Gold glow pulse — for live/active indicators */
-  .glow-gold {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold-400) 40%, transparent);
-    animation: pulse-gold 2.4s ease-in-out infinite;
-  }
 }
 
 /* ============================================================
-   ANIMATIONS
+   ANIMATIONS — Purposeful, not decorative
    ============================================================ */
 
+/* Page-level entrance — stagger children with animation-delay */
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(12px);
   }
 
   to {
@@ -1906,7 +1606,7 @@
 @keyframes scale-in {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
 
   to {
@@ -1918,7 +1618,7 @@
 @keyframes slide-in-right {
   from {
     opacity: 0;
-    transform: translateX(18px);
+    transform: translateX(16px);
   }
 
   to {
@@ -1935,7 +1635,7 @@
   }
 
   50% {
-    box-shadow: 0 0 0 7px color-mix(in srgb, var(--gold-400) 0%, transparent);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--gold-400) 0%, transparent);
   }
 }
 
@@ -1980,14 +1680,6 @@
   animation-delay: 450ms;
 }
 
-.delay-525 {
-  animation-delay: 525ms;
-}
-
-.delay-600 {
-  animation-delay: 600ms;
-}
-
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
 
@@ -2001,8 +1693,25 @@
 }
 
 /* ============================================================
-   PRINT
+   DARK MODE SURFACE TEXTURE
+   The subtle noise that makes dark backgrounds feel physical
    ============================================================ */
+
+.dark body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.018;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: overlay;
+}
+
+/* ============================================================
+   PRINT — Financial documents need to print cleanly
+   ============================================================ */
+
 @media print {
   body {
     background: white;
@@ -2035,3 +1744,4 @@
     break-inside: avoid;
   }
 }
+
