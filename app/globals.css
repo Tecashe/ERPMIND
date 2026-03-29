@@ -345,7 +345,6 @@
   h6 {
     font-family: var(--font-serif);
     font-weight: 400;
-    /* DM Serif Display is italic-capable; let it breathe */
     line-height: 1.15;
     letter-spacing: var(--tracking-tight);
     color: var(--foreground);
@@ -564,7 +563,18 @@
 
   /* Stat card variant — for KPI numbers */
   .card-stat {
-    @apply card-premium;
+    /* Inlined from .card-premium */
+    background: var(--card);
+    color: var(--card-foreground);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    transition:
+      box-shadow var(--duration-base) var(--ease-out-quart),
+      border-color var(--duration-base) var(--ease-out-quart),
+      transform var(--duration-base) var(--ease-out-quart);
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
@@ -658,16 +668,52 @@
 
   /* Gold accent button — for primary CTAs */
   .btn-gold {
-    @apply btn-primary;
+    /* Inlined from .btn-primary */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    letter-spacing: 0.01em;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition:
+      transform var(--duration-fast) var(--ease-spring),
+      box-shadow var(--duration-base) var(--ease-out-quart),
+      background var(--duration-fast) var(--ease-out-quart);
     background: var(--gold-500);
     color: var(--obsidian-950);
-    border-color: var(--gold-400);
+    border: 1px solid var(--gold-400);
     font-weight: 600;
+  }
+
+  .btn-gold::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.12) 50%, transparent 60%);
+    transform: translateX(-100%);
+    transition: transform 0.4s var(--ease-out-expo);
+    pointer-events: none;
+  }
+
+  .btn-gold:hover::after {
+    transform: translateX(100%);
   }
 
   .btn-gold:hover {
     background: var(--gold-400);
     box-shadow: 0 4px 16px rgba(201, 138, 0, 0.30);
+    transform: translateY(-1px);
+  }
+
+  .btn-gold:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-xs);
   }
 
   .btn-secondary {
@@ -700,8 +746,35 @@
     transform: translateY(0);
   }
 
+  /* btn-outline is identical to btn-secondary */
   .btn-outline {
-    @apply btn-secondary;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: transparent;
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-strong);
+    cursor: pointer;
+    transition:
+      background var(--duration-fast) var(--ease-out-quart),
+      border-color var(--duration-fast) var(--ease-out-quart),
+      transform var(--duration-fast) var(--ease-spring);
+  }
+
+  .btn-outline:hover {
+    background: var(--muted);
+    border-color: var(--border);
+    transform: translateY(-1px);
+  }
+
+  .btn-outline:active {
+    transform: translateY(0);
   }
 
   .btn-ghost {
@@ -790,38 +863,134 @@
   }
 
   .badge-success {
-    @apply badge;
+    /* Inlined from .badge */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.625rem;
+    border-radius: 100px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
     background: color-mix(in srgb, var(--forest-400) 12%, transparent);
     color: var(--forest-400);
     border: 1px solid color-mix(in srgb, var(--forest-400) 20%, transparent);
   }
 
+  .badge-success::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
   .badge-warning {
-    @apply badge;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.625rem;
+    border-radius: 100px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
     background: color-mix(in srgb, var(--gold-400) 12%, transparent);
     color: var(--gold-500);
     border: 1px solid color-mix(in srgb, var(--gold-400) 20%, transparent);
   }
 
+  .badge-warning::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
   .badge-danger {
-    @apply badge;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.625rem;
+    border-radius: 100px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
     background: color-mix(in srgb, var(--signal-400) 12%, transparent);
     color: var(--signal-400);
     border: 1px solid color-mix(in srgb, var(--signal-400) 20%, transparent);
   }
 
+  .badge-danger::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
   .badge-neutral {
-    @apply badge;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.625rem;
+    border-radius: 100px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
     background: var(--muted);
     color: var(--muted-foreground);
     border: 1px solid var(--border);
   }
 
+  .badge-neutral::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
   .badge-primary {
-    @apply badge;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.625rem;
+    border-radius: 100px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
     background: var(--primary);
     color: var(--primary-foreground);
     border: 1px solid transparent;
+  }
+
+  .badge-primary::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
   }
 
   /* ==========================================
@@ -1138,7 +1307,10 @@
   }
 
   .amount-large {
-    @apply amount;
+    /* Inlined from .amount */
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    font-weight: 500;
     font-family: var(--font-serif);
     font-size: 1.75rem;
     line-height: 1;
@@ -1308,14 +1480,22 @@
   }
 
   .icon-container-sm {
-    @apply icon-container;
+    /* Inlined from .icon-container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
     width: 2rem;
     height: 2rem;
     border-radius: var(--radius-sm);
   }
 
   .icon-container-lg {
-    @apply icon-container;
+    /* Inlined from .icon-container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
     width: 3rem;
     height: 3rem;
     border-radius: var(--radius-lg);
