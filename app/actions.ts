@@ -3,6 +3,9 @@
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 
+// Re-export accounting actions for backward compat
+export { getInvoices } from '@/app/actions/accounting'
+
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 
 const revalidateAll = () => {

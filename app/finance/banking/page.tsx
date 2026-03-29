@@ -1,114 +1,107 @@
 import React from 'react';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { Scale, TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
-import { getFinanceSummary, getFinancialRecords } from '@/app/actions';
+import { Wallet, Plus, RefreshCw } from 'lucide-react';
+import { getBankAccounts } from '@/app/actions/accounting';
+import { CreateBankAccountModal } from '@/components/accounting/create-bank-account-modal';
 
-export default async function BankReconciliationPage() {
-  const [summary, records] = await Promise.all([
-    getFinanceSummary(),
-    getFinancialRecords(),
-  ]);
+const fmt = (n: number) => n.toLocaleString('en-KE', { minimumFractionDigits: 2 });
 
-  const fmt = (n: number) => `KES ${n.toLocaleString('en-KE', { minimumFractionDigits: 2 })}`;
+const BANK_COLORS: Record<string, string> = {
+  KCB: 'bg-green-600', Equity: 'bg-red-600', 'M-Pesa': 'bg-emerald-500',
+  NCBA: 'bg-blue-700', Absa: 'bg-red-700', 'Co-op': 'bg-blue-600',
+  Stanbic: 'bg-blue-900', 'Standard Chartered': 'bg-blue-800',
+};
 
-  // Group by category
-  const byCategory = records.reduce<Record<string, { in: number; out: number }>>((acc, r) => {
-    const cat = r.category ?? 'GENERAL';
-    if (!acc[cat]) acc[cat] = { in: 0, out: 0 };
-    if (r.type === 'INCOME') acc[cat].in += r.amount;
-    else acc[cat].out += r.amount;
-    return acc;
-  }, {});
+export default async function BankingPage() {
+  const accounts = await getBankAccounts();
+  const totalBalance = accounts.reduce((s, a) => s + a.currentBalance, 0);
 
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">Bank Reconciliation</h1>
-          <p className="text-muted-foreground">Compare financial records against your bank statement — reconcile debits and credits.</p>
+
+        {/* Header */}
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="p-2.5 rounded-xl bg-primary/10">
+                <Wallet className="w-7 h-7 text-primary" />
+              </div>
+              <h1 className="text-4xl font-bold text-foreground tracking-tight">Banking</h1>
+            </div>
+            <p className="text-muted-foreground ml-14">Bank accounts · Reconciliation · M-Pesa · Multi-currency</p>
+          </div>
+          <CreateBankAccountModal />
         </div>
 
-        {/* Summary Reconciliation View */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="card-premium p-6 flex items-center gap-4">
-            <div className="p-3 bg-primary/10 text-primary rounded-xl"><TrendingUp className="w-6 h-6" /></div>
+        {/* Total Balance */}
+        <div className="mb-8 card-premium p-6 border-primary/20">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground font-medium">Total Credits</p>
-              <h3 className="text-xl font-bold text-primary">{fmt(summary.totalIncome)}</h3>
+              <p className="text-sm text-muted-foreground font-medium mb-1">Total Cash Position</p>
+              <p className="text-4xl font-bold text-primary">KES {fmt(totalBalance)}</p>
+              <p className="text-sm text-muted-foreground mt-1">{accounts.length} account{accounts.length !== 1 ? 's' : ''}</p>
             </div>
-          </div>
-          <div className="card-premium p-6 flex items-center gap-4">
-            <div className="p-3 bg-destructive/10 text-destructive rounded-xl"><TrendingDown className="w-6 h-6" /></div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">Total Debits</p>
-              <h3 className="text-xl font-bold text-destructive">{fmt(summary.totalExpenses)}</h3>
-            </div>
-          </div>
-          <div className="card-premium p-6 flex items-center gap-4">
-            <div className={`p-3 rounded-xl ${summary.netBalance >= 0 ? 'bg-primary/10 text-primary' : 'bg-destructive/10 text-destructive'}`}>
-              <Scale className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">Closing Balance</p>
-              <h3 className={`text-xl font-bold ${summary.netBalance >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                {summary.netBalance < 0 ? '-' : ''}{fmt(Math.abs(summary.netBalance))}
-              </h3>
-            </div>
+            <Wallet className="w-16 h-16 text-primary/10" />
           </div>
         </div>
 
-        {/* By Category */}
-        <div className="card-premium overflow-hidden">
-          <div className="p-6 border-b border-border flex items-center gap-3">
-            <BarChart3 className="w-5 h-5 text-primary" />
-            <h2 className="text-xl font-bold text-foreground">Reconciliation by Category</h2>
+        {/* Bank Cards */}
+        {accounts.length === 0 ? (
+          <div className="card-premium py-20 text-center">
+            <Wallet className="w-14 h-14 text-muted-foreground/30 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">No bank accounts yet</h3>
+            <p className="text-muted-foreground mb-6">Add your KCB, Equity, M-Pesa or any other account to start tracking cash.</p>
+            <CreateBankAccountModal />
           </div>
-          {Object.keys(byCategory).length === 0 ? (
-            <div className="py-12 text-center">
-              <Scale className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No transactions to reconcile yet.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-muted/30 text-muted-foreground text-sm">
-                    <th className="py-3 px-6 font-semibold">Category</th>
-                    <th className="py-3 px-6 font-semibold text-right">Credits (KES)</th>
-                    <th className="py-3 px-6 font-semibold text-right">Debits (KES)</th>
-                    <th className="py-3 px-6 font-semibold text-right">Net (KES)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(byCategory).map(([cat, vals]) => {
-                    const net = vals.in - vals.out;
-                    return (
-                      <tr key={cat} className="border-t border-border hover:bg-muted/20 transition-colors">
-                        <td className="py-4 px-6">
-                          <span className="px-2.5 py-1 text-xs rounded-full bg-secondary/10 text-secondary font-medium">{cat}</span>
-                        </td>
-                        <td className="py-4 px-6 text-right font-mono text-primary">{vals.in.toLocaleString('en-KE', { minimumFractionDigits: 2 })}</td>
-                        <td className="py-4 px-6 text-right font-mono text-destructive">{vals.out.toLocaleString('en-KE', { minimumFractionDigits: 2 })}</td>
-                        <td className={`py-4 px-6 text-right font-mono font-bold ${net >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                          {net < 0 ? '-' : '+'} {Math.abs(net).toLocaleString('en-KE', { minimumFractionDigits: 2 })}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr className="bg-muted/30 border-t-2 border-border">
-                    <td className="py-3 px-6 font-bold text-foreground">TOTAL</td>
-                    <td className="py-3 px-6 text-right font-mono font-bold text-primary">{fmt(summary.totalIncome)}</td>
-                    <td className="py-3 px-6 text-right font-mono font-bold text-destructive">{fmt(summary.totalExpenses)}</td>
-                    <td className={`py-3 px-6 text-right font-mono font-bold ${summary.netBalance >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                      {summary.netBalance < 0 ? '-' : '+'} {fmt(Math.abs(summary.netBalance))}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-          )}
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+            {accounts.map((acc) => {
+              const colorClass = BANK_COLORS[acc.bankName] ?? 'bg-primary';
+              return (
+                <div key={acc.id} className="card-premium overflow-hidden">
+                  <div className={`${colorClass} p-5 text-white`}>
+                    <div className="flex items-center justify-between mb-6">
+                      <p className="font-semibold">{acc.bankName}</p>
+                      <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{acc.accountType}</span>
+                    </div>
+                    <p className="font-mono text-sm opacity-80">{acc.accountNumber}</p>
+                  </div>
+                  <div className="p-5">
+                    <p className="text-xs text-muted-foreground font-medium mb-1">{acc.name}</p>
+                    <p className="text-2xl font-bold text-foreground">{acc.currency} {fmt(acc.currentBalance)}</p>
+                    <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      <span>{(acc as unknown as { _count: { transactions: number } })._count.transactions} transactions</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Reconciliation Info */}
+        <div className="card-premium p-6 border border-border">
+          <h2 className="font-bold text-foreground mb-3 flex items-center gap-2">
+            <RefreshCw className="w-5 h-5 text-primary" /> Bank Reconciliation
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Import bank statements (CSV) to match transactions against your journal entries. 
+            Supports KCB, Equity Bank, M-Pesa paybill exports, and standard OFX/CSV formats.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            {[
+              { label: 'M-Pesa Statement', desc: 'Download from M-Pesa portal → Business → Statements' },
+              { label: 'KCB/Equity CSV', desc: 'Download from internet banking → Transactions → Export CSV' },
+              { label: 'Manual Entry', desc: 'Record individual transactions manually for cash accounts' },
+            ].map((item) => (
+              <div key={item.label} className="bg-muted/30 rounded-xl p-4 border border-border">
+                <p className="font-semibold text-foreground mb-1">{item.label}</p>
+                <p className="text-muted-foreground text-xs">{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </DashboardLayout>

@@ -7,31 +7,384 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── MODULE CONFIG (Standalone Module Support) ────────────────────────────────
+
+model ModuleConfig {
+  id                  String   @id @default(cuid())
+  tenantId            String   @default("default") @unique
+  accountingEnabled   Boolean  @default(true)
+  salesEnabled        Boolean  @default(true)
+  inventoryEnabled    Boolean  @default(true)
+  hrEnabled           Boolean  @default(true)
+  crmEnabled          Boolean  @default(true)
+  procurementEnabled  Boolean  @default(true)
+  productionEnabled   Boolean  @default(true)
+  bankingEnabled      Boolean  @default(true)
+  budgetingEnabled    Boolean  @default(true)
+  assetsEnabled       Boolean  @default(true)
+  updatedAt           DateTime @updatedAt
+}
+
+// ─── CHART OF ACCOUNTS (Double-entry) ─────────────────────────────────────────
+
+model ChartOfAccount {
+  id            String           @id @default(cuid())
+  code          String           @unique  // e.g. "1100"
+  name          String           // e.g. "Cash and Cash Equivalents"
+  type          String           // ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE
+  subType       String?          // e.g. "CURRENT_ASSET", "FIXED_ASSET", "CURRENT_LIABILITY"
+  description   String?
+  isSystem      Boolean          @default(false)  // system accounts cannot be deleted
+  isActive      Boolean          @default(true)
+  parentId      String?
+  parent        ChartOfAccount?  @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children      ChartOfAccount[] @relation("AccountHierarchy")
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  journalLines  JournalLine[]
+  budgetPlans   BudgetPlan[]
+  bankAccounts  BankAccount[]
+}
+
+// ─── JOURNAL ENTRIES (Double-entry Bookkeeping) ───────────────────────────────
+
+model JournalEntry {
+  id            String        @id @default(cuid())
+  reference     String        @unique  // e.g. "JE-2025-0001"
+  description   String
+  entryDate     DateTime      @default(now())
+  status        String        @default("POSTED")  // DRAFT, POSTED, VOIDED
+  source        String?       // SALE, PURCHASE, PAYROLL, MANUAL, BANK, DEPRECIATION
+  sourceId      String?       // FK to source record
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  lines         JournalLine[]
+}
+
+model JournalLine {
+  id             String         @id @default(cuid())
+  journalEntry   JournalEntry   @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  journalEntryId String
+  account        ChartOfAccount @relation(fields: [accountId], references: [id])
+  accountId      String
+  description    String?
+  debit          Float          @default(0)
+  credit         Float          @default(0)
+  createdAt      DateTime       @default(now())
+}
+
+// ─── TAX RATES ────────────────────────────────────────────────────────────────
+
+model TaxRate {
+  id          String        @id @default(cuid())
+  name        String        // e.g. "VAT 16%", "WHT 5%", "Exempt"
+  code        String        @unique  // VAT16, WHT5, EXEMPT, ZERO
+  rate        Float         // 0.16, 0.05, 0, etc.
+  taxType     String        // VAT, WHT, EXEMPT
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  invoiceItems InvoiceLineItem[]
+  billItems    BillLineItem[]
+}
+
+// ─── INVOICES (Accounts Receivable + eTIMS) ───────────────────────────────────
+
+model Invoice {
+  id              String            @id @default(cuid())
+  invoiceNumber   String            @unique  // e.g. "INV-2025-0001"
+  customer        Customer?         @relation(fields: [customerId], references: [id])
+  customerId      String?
+  customerName    String?           // for walk-in / unnamed customer
+  customerPin     String?           // KRA PIN for B2B eTIMS
+  customerEmail   String?
+  issueDate       DateTime          @default(now())
+  dueDate         DateTime?
+  status          String            @default("DRAFT")  // DRAFT, SENT, PAID, OVERDUE, CANCELLED, CREDIT_NOTE
+  currency        String            @default("KES")
+  subtotal        Float             @default(0)
+  totalVat        Float             @default(0)
+  totalAmount     Float             @default(0)
+  amountPaid      Float             @default(0)
+  notes           String?
+  terms           String?
+  // eTIMS Fields
+  etimsStatus     String?           // PENDING, SUBMITTED, ACCEPTED, REJECTED
+  etimsCuSerial   String?           // Control Unit Serial Number
+  etimsInvoiceNo  String?           // KRA assigned invoice number
+  etimsQrCode     String?           // QR code data URL
+  etimsSubmittedAt DateTime?
+  etimsResponseAt DateTime?
+  etimsError      String?
+  // Sale link
+  sale            Sale?             @relation(fields: [saleId], references: [id])
+  saleId          String?           @unique
+  // Journal
+  journalEntryId  String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  lineItems       InvoiceLineItem[]
+  payments        InvoicePayment[]
+  etimsLogs       ETIMSLog[]
+}
+
+model InvoiceLineItem {
+  id          String    @id @default(cuid())
+  invoice     Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoiceId   String
+  description String
+  quantity    Float     @default(1)
+  unitPrice   Float
+  discount    Float     @default(0)
+  taxRate     TaxRate?  @relation(fields: [taxRateId], references: [id])
+  taxRateId   String?
+  taxAmount   Float     @default(0)
+  lineTotal   Float
+  createdAt   DateTime  @default(now())
+}
+
+model InvoicePayment {
+  id            String   @id @default(cuid())
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id])
+  invoiceId     String
+  amount        Float
+  paymentDate   DateTime @default(now())
+  paymentMethod String   // CASH, BANK, MPESA, CHEQUE, CREDIT
+  reference     String?
+  notes         String?
+  createdAt     DateTime @default(now())
+}
+
+// ─── eTIMS LOGS ───────────────────────────────────────────────────────────────
+
+model ETIMSLog {
+  id          String    @id @default(cuid())
+  invoice     Invoice?  @relation(fields: [invoiceId], references: [id])
+  invoiceId   String?
+  action      String    // SUBMIT, QUERY, VOID
+  requestBody String    @db.Text
+  responseBody String?  @db.Text
+  statusCode  Int?
+  success     Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
+
+// ─── BILLS (Accounts Payable) ─────────────────────────────────────────────────
+
+model Bill {
+  id              String          @id @default(cuid())
+  billNumber      String          @unique
+  supplier        Supplier?       @relation(fields: [supplierId], references: [id])
+  supplierId      String?
+  supplierName    String?
+  issueDate       DateTime        @default(now())
+  dueDate         DateTime?
+  status          String          @default("UNPAID")  // UNPAID, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED
+  subtotal        Float           @default(0)
+  totalVat        Float           @default(0)
+  totalAmount     Float           @default(0)
+  amountPaid      Float           @default(0)
+  notes           String?
+  purchaseOrder   PurchaseOrder?  @relation(fields: [purchaseOrderId], references: [id])
+  purchaseOrderId String?         @unique
+  journalEntryId  String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  lineItems       BillLineItem[]
+  payments        BillPayment[]
+}
+
+model BillLineItem {
+  id          String   @id @default(cuid())
+  bill        Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+  billId      String
+  description String
+  quantity    Float    @default(1)
+  unitPrice   Float
+  taxRate     TaxRate? @relation(fields: [taxRateId], references: [id])
+  taxRateId   String?
+  taxAmount   Float    @default(0)
+  lineTotal   Float
+  createdAt   DateTime @default(now())
+}
+
+model BillPayment {
+  id            String   @id @default(cuid())
+  bill          Bill     @relation(fields: [billId], references: [id])
+  billId        String
+  amount        Float
+  paymentDate   DateTime @default(now())
+  paymentMethod String
+  reference     String?
+  createdAt     DateTime @default(now())
+}
+
+// ─── BANK ACCOUNTS & RECONCILIATION ──────────────────────────────────────────
+
+model BankAccount {
+  id            String             @id @default(cuid())
+  name          String             // e.g. "KCB Business Account"
+  bankName      String             // e.g. "KCB", "Equity", "M-Pesa"
+  accountNumber String
+  currency      String             @default("KES")
+  openingBalance Float             @default(0)
+  currentBalance Float             @default(0)
+  accountType   String             @default("CURRENT")  // CURRENT, SAVINGS, MPESA, LOAN
+  isActive      Boolean            @default(true)
+  coaAccount    ChartOfAccount?    @relation(fields: [coaAccountId], references: [id])
+  coaAccountId  String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  transactions  BankTransaction[]
+  reconciliations Reconciliation[]
+}
+
+model BankTransaction {
+  id              String       @id @default(cuid())
+  bankAccount     BankAccount  @relation(fields: [bankAccountId], references: [id])
+  bankAccountId   String
+  transactionDate DateTime
+  description     String
+  reference       String?
+  amount          Float        // positive = credit, negative = debit
+  type            String       // CREDIT, DEBIT
+  isReconciled    Boolean      @default(false)
+  journalEntryId  String?
+  reconciliation  Reconciliation? @relation(fields: [reconciliationId], references: [id])
+  reconciliationId String?
+  createdAt       DateTime     @default(now())
+}
+
+model Reconciliation {
+  id              String            @id @default(cuid())
+  bankAccount     BankAccount       @relation(fields: [bankAccountId], references: [id])
+  bankAccountId   String
+  startDate       DateTime
+  endDate         DateTime
+  openingBalance  Float
+  closingBalance  Float
+  status          String            @default("IN_PROGRESS")  // IN_PROGRESS, COMPLETE
+  completedAt     DateTime?
+  createdAt       DateTime          @default(now())
+  transactions    BankTransaction[]
+}
+
+// ─── TAX FILING PERIODS ───────────────────────────────────────────────────────
+
+model TaxFilingPeriod {
+  id            String    @id @default(cuid())
+  taxType       String    // VAT, PAYE, NSSF, SHIF, AHL, WHT
+  period        String    // e.g. "March 2025"
+  periodStart   DateTime
+  periodEnd     DateTime
+  dueDate       DateTime
+  taxableAmount Float     @default(0)
+  taxAmount     Float     @default(0)
+  penaltyAmount Float     @default(0)
+  status        String    @default("PENDING")  // PENDING, FILED, LATE
+  filedAt       DateTime?
+  paymentRef    String?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// ─── PAYROLL DEDUCTIONS (Kenya Statutory) ─────────────────────────────────────
+
+model PayrollDeduction {
+  id            String   @id @default(cuid())
+  payroll       Payroll  @relation(fields: [payrollId], references: [id])
+  payrollId     String   @unique
+  grossSalary   Float
+  shiF          Float    @default(0)   // 2.75% (replaces NHIF)
+  ahl           Float    @default(0)   // 1.5% employee
+  ahlEmployer   Float    @default(0)   // 1.5% employer
+  nssfEmployee  Float    @default(0)   // 6% employee (tiered)
+  nssfEmployer  Float    @default(0)   // 6% employer (tiered)
+  taxableIncome Float    @default(0)   // after SHIF + AHL deductions
+  paye          Float    @default(0)   // progressive tax
+  personalRelief Float   @default(2400) // KES 2,400/month
+  netPay        Float    @default(0)
+  createdAt     DateTime @default(now())
+}
+
+// ─── BUDGET PLANS ─────────────────────────────────────────────────────────────
+
+model BudgetPlan {
+  id        String         @id @default(cuid())
+  account   ChartOfAccount @relation(fields: [accountId], references: [id])
+  accountId String
+  period    String         // e.g. "2025-03" (YYYY-MM)
+  amount    Float          // budgeted amount
+  notes     String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([accountId, period])
+}
+
+// ─── FIXED ASSET REGISTER ─────────────────────────────────────────────────────
+
+model Asset {
+  id                  String    @id @default(cuid())
+  name                String
+  assetCode           String    @unique
+  category            String    // EQUIPMENT, VEHICLE, FURNITURE, BUILDING, INTANGIBLE
+  description         String?
+  acquisitionDate     DateTime
+  acquisitionCost     Float
+  depreciationMethod  String    @default("STRAIGHT_LINE")  // STRAIGHT_LINE, DECLINING
+  usefulLifeYears     Float     @default(5)
+  residualValue       Float     @default(0)
+  accumulatedDeprec   Float     @default(0)
+  bookValue           Float
+  status              String    @default("ACTIVE")  // ACTIVE, DISPOSED, FULLY_DEPRECIATED
+  location            String?
+  notes               String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  depreciations       AssetDepreciation[]
+}
+
+model AssetDepreciation {
+  id              String   @id @default(cuid())
+  asset           Asset    @relation(fields: [assetId], references: [id])
+  assetId         String
+  period          String   // "2025-03"
+  amount          Float
+  journalEntryId  String?
+  createdAt       DateTime @default(now())
+}
+
 // ─── HR MODULE ────────────────────────────────────────────────────────────────
 
 model Employee {
-  id           String      @id @default(cuid())
+  id           String             @id @default(cuid())
   name         String
-  email        String      @unique
-  role         String      @default("STAFF") // ADMIN, MANAGER, STAFF
+  email        String             @unique
+  role         String             @default("STAFF")  // ADMIN, MANAGER, STAFF
   department   String
   salary       Float
-  hiredAt      DateTime    @default(now())
-  isActive     Boolean     @default(true)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  kraPin       String?            // Employee KRA PIN for PAYE
+  nationalId   String?
+  bankAccount  String?
+  bankName     String?
+  hiredAt      DateTime           @default(now())
+  isActive     Boolean            @default(true)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
   payrolls     Payroll[]
 }
 
 model Payroll {
-  id               String          @id @default(cuid())
-  employee         Employee        @relation(fields: [employeeId], references: [id])
-  employeeId       String
-  amount           Float
-  period           String          // e.g. "March 2025"
-  paidAt           DateTime        @default(now())
-  financialRecord  FinancialRecord? @relation(fields: [financialRecordId], references: [id])
-  financialRecordId String?        @unique
+  id                String            @id @default(cuid())
+  employee          Employee          @relation(fields: [employeeId], references: [id])
+  employeeId        String
+  amount            Float             // gross salary
+  period            String            // e.g. "March 2025"
+  paidAt            DateTime          @default(now())
+  financialRecord   FinancialRecord?  @relation(fields: [financialRecordId], references: [id])
+  financialRecordId String?           @unique
+  deduction         PayrollDeduction?
 }
 
 // ─── CRM MODULE ───────────────────────────────────────────────────────────────
@@ -42,8 +395,12 @@ model Customer {
   email     String?   @unique
   phone     String?
   company   String?
+  kraPin    String?   // KRA PIN for eTIMS B2B invoicing
+  address   String?
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   sales     Sale[]
+  invoices  Invoice[]
 }
 
 // ─── PROCUREMENT MODULE ───────────────────────────────────────────────────────
@@ -54,26 +411,29 @@ model Supplier {
   email          String?
   phone          String?
   address        String?
+  kraPin         String?         // KRA PIN for WHT compliance
   createdAt      DateTime        @default(now())
   purchaseOrders PurchaseOrder[]
+  bills          Bill[]
 }
 
 model PurchaseOrder {
-  id                String          @id @default(cuid())
-  supplier          Supplier        @relation(fields: [supplierId], references: [id])
+  id                String           @id @default(cuid())
+  supplier          Supplier         @relation(fields: [supplierId], references: [id])
   supplierId        String
-  product           Product?        @relation(fields: [productId], references: [id])
+  product           Product?         @relation(fields: [productId], references: [id])
   productId         String?
-  rawMaterial       RawMaterial?    @relation(fields: [rawMaterialId], references: [id])
+  rawMaterial       RawMaterial?     @relation(fields: [rawMaterialId], references: [id])
   rawMaterialId     String?
   quantity          Float
   unitCostKES       Float
   totalCostKES      Float
-  status            String          @default("PENDING") // PENDING, RECEIVED, CANCELLED
-  createdAt         DateTime        @default(now())
+  status            String           @default("PENDING")  // PENDING, RECEIVED, CANCELLED
+  createdAt         DateTime         @default(now())
   receivedAt        DateTime?
   financialRecord   FinancialRecord? @relation(fields: [financialRecordId], references: [id])
-  financialRecordId String?         @unique
+  financialRecordId String?          @unique
+  bill              Bill?
 }
 
 // ─── INVENTORY MODULE ─────────────────────────────────────────────────────────
@@ -93,13 +453,13 @@ model Product {
 }
 
 model RawMaterial {
-  id             String          @id @default(cuid())
+  id             String                 @id @default(cuid())
   name           String
-  unit           String          // e.g. "kg", "liters", "units"
-  stockLevel     Float           @default(0)
-  lowStockAlert  Float           @default(10)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  unit           String
+  stockLevel     Float                  @default(0)
+  lowStockAlert  Float                  @default(10)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
   purchaseOrders PurchaseOrder[]
   productionRuns ProductionRunMaterial[]
 }
@@ -136,28 +496,28 @@ model Sale {
   quantity          Int
   totalAmount       Float
   vatAmount         Float
-  status            String           @default("PAID") // PAID, PENDING
+  status            String           @default("PAID")  // PAID, PENDING, CANCELLED
   saleDate          DateTime         @default(now())
   financialRecord   FinancialRecord? @relation(fields: [financialRecordId], references: [id])
   financialRecordId String?          @unique
+  invoice           Invoice?
 }
 
-// ─── FINANCE MODULE ───────────────────────────────────────────────────────────
+// ─── FINANCE / GENERAL LEDGER ─────────────────────────────────────────────────
 
 model FinancialRecord {
   id            String         @id @default(cuid())
   type          String         // INCOME, EXPENSE
   amount        Float
   description   String
-  category      String         @default("GENERAL") // SALES, PAYROLL, PROCUREMENT, GENERAL
+  category      String         @default("GENERAL")
   date          DateTime       @default(now())
-  // Back-relations for full audit trail
   sale          Sale?
   purchaseOrder PurchaseOrder?
   payroll       Payroll?
 }
 
-// ─── AUTHENTICATION MODULE ────────────────────────────────────────────────────
+// ─── AUTHENTICATION ───────────────────────────────────────────────────────────
 
 model User {
   id            String    @id @default(cuid())
@@ -166,7 +526,7 @@ model User {
   password      String?
   emailVerified DateTime?
   image         String?
-  role          String    @default("USER") // ADMIN, USER
+  role          String    @default("USER")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
@@ -174,20 +534,19 @@ model User {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }

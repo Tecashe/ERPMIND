@@ -1,89 +1,127 @@
 import React from 'react';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { PieChart, Construction } from 'lucide-react';
-import { getFinanceSummary } from '@/app/actions';
+import { BarChart3, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+import { getChartOfAccounts, getBudgetVsActual, createBudget } from '@/app/actions/accounting';
+
+const fmt = (n: number) => n.toLocaleString('en-KE', { minimumFractionDigits: 2 });
+const currentPeriod = new Date().toISOString().slice(0, 7); // YYYY-MM
 
 export default async function BudgetingPage() {
-  const summary = await getFinanceSummary();
-  const fmt = (n: number) => `KES ${n.toLocaleString('en-KE', { minimumFractionDigits: 2 })}`;
+  const [accounts, budgets] = await Promise.all([
+    getChartOfAccounts(),
+    getBudgetVsActual(currentPeriod),
+  ]);
 
-  const categories = [
-    { label: 'Payroll', budget: 500000, actual: summary.records.filter(r => r.category === 'PAYROLL').reduce((s, r) => s + r.amount, 0) },
-    { label: 'Procurement', budget: 800000, actual: summary.records.filter(r => r.category === 'PROCUREMENT').reduce((s, r) => s + r.amount, 0) },
-    { label: 'General', budget: 200000, actual: summary.records.filter(r => r.category === 'GENERAL' && r.type === 'EXPENSE').reduce((s, r) => s + r.amount, 0) },
-  ];
+  const totalBudgeted = budgets.reduce((s, b) => s + b.amount, 0);
+  const totalActual = budgets.reduce((s, b) => s + b.actual, 0);
+  const overBudget = budgets.filter((b) => b.variancePct > 10);
+
+  const periodLabel = new Date().toLocaleDateString('en-KE', { month: 'long', year: 'numeric' });
 
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">Budgeting</h1>
-          <p className="text-muted-foreground">Track planned vs. actual expenditure across major cost categories.</p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="card-premium p-6">
-            <p className="text-sm text-muted-foreground font-medium mb-1">Total Budgeted</p>
-            <h3 className="text-2xl font-bold text-foreground">{fmt(categories.reduce((s, c) => s + c.budget, 0))}</h3>
-          </div>
-          <div className="card-premium p-6">
-            <p className="text-sm text-muted-foreground font-medium mb-1">Total Spent</p>
-            <h3 className="text-2xl font-bold text-destructive">{fmt(summary.totalExpenses)}</h3>
-          </div>
-          <div className="card-premium p-6">
-            <p className="text-sm text-muted-foreground font-medium mb-1">Budget Variance</p>
-            {(() => {
-              const totalBudget = categories.reduce((s, c) => s + c.budget, 0);
-              const variance = totalBudget - summary.totalExpenses;
-              return (
-                <h3 className={`text-2xl font-bold ${variance >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                  {variance < 0 ? '-' : '+'}{fmt(Math.abs(variance))}
-                </h3>
-              );
-            })()}
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="p-2.5 rounded-xl bg-primary/10">
+                <BarChart3 className="w-7 h-7 text-primary" />
+              </div>
+              <h1 className="text-4xl font-bold text-foreground tracking-tight">Budgeting</h1>
+            </div>
+            <p className="text-muted-foreground ml-14">Budget vs Actuals · Variance Analysis — {periodLabel}</p>
           </div>
         </div>
 
-        {/* Budget vs Actual breakdown */}
-        <div className="card-premium p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <PieChart className="w-5 h-5 text-primary" />
-            <h2 className="text-xl font-bold text-foreground">Budget vs. Actual</h2>
+        {/* Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+          <div className="card-premium p-6">
+            <div className="flex items-center gap-2 mb-3">
+              <BarChart3 className="w-5 h-5 text-primary" />
+              <span className="text-sm text-muted-foreground">Total Budgeted</span>
+            </div>
+            <p className="text-2xl font-bold text-foreground">KES {fmt(totalBudgeted)}</p>
           </div>
-          <div className="space-y-6">
-            {categories.map((cat) => {
-              const pct = cat.budget > 0 ? Math.min((cat.actual / cat.budget) * 100, 100) : 0;
-              const overBudget = cat.actual > cat.budget;
-              return (
-                <div key={cat.label}>
-                  <div className="flex justify-between items-baseline mb-2">
-                    <span className="font-semibold text-foreground">{cat.label}</span>
-                    <div className="text-right text-sm">
-                      <span className={overBudget ? 'text-destructive font-bold' : 'text-primary font-bold'}>
-                        {fmt(cat.actual)}
-                      </span>
-                      <span className="text-muted-foreground"> / {fmt(cat.budget)}</span>
-                    </div>
-                  </div>
-                  <div className="h-3 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${overBudget ? 'bg-destructive' : 'bg-primary'}`}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">{pct.toFixed(1)}% of budget used</p>
-                </div>
-              );
-            })}
+          <div className="card-premium p-6">
+            <div className="flex items-center gap-2 mb-3">
+              <TrendingUp className="w-5 h-5 text-blue-500" />
+              <span className="text-sm text-muted-foreground">Total Actual</span>
+            </div>
+            <p className="text-2xl font-bold text-blue-500">KES {fmt(totalActual)}</p>
+          </div>
+          <div className={`card-premium p-6 ${overBudget.length > 0 ? 'border-red-500/30' : ''}`}>
+            <div className="flex items-center gap-2 mb-3">
+              <AlertTriangle className={`w-5 h-5 ${overBudget.length > 0 ? 'text-red-500' : 'text-muted-foreground'}`} />
+              <span className="text-sm text-muted-foreground">Over Budget</span>
+            </div>
+            <p className={`text-2xl font-bold ${overBudget.length > 0 ? 'text-red-500' : 'text-foreground'}`}>
+              {overBudget.length} accounts
+            </p>
           </div>
         </div>
 
-        <div className="mt-6 card-premium p-6 border border-dashed border-border flex items-center gap-4">
-          <Construction className="w-8 h-8 text-muted-foreground flex-shrink-0" />
-          <p className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">Advanced budgeting</span> — custom budget targets per department, period planning, and forecasting will be available in the next schema update.
-          </p>
-        </div>
+        {budgets.length === 0 ? (
+          <div className="card-premium py-20 text-center">
+            <BarChart3 className="w-14 h-14 text-muted-foreground/30 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">No budgets set for {periodLabel}</h3>
+            <p className="text-muted-foreground max-w-md mx-auto mb-6">
+              Set monthly budgets per account to track spending vs plan. Budgets are set per Chart of Accounts entry.
+            </p>
+            {accounts.length === 0 && (
+              <p className="text-sm text-muted-foreground">First, ensure your Chart of Accounts is set up (run the CoA seed script).</p>
+            )}
+          </div>
+        ) : (
+          <div className="card-premium overflow-hidden">
+            <div className="p-5 border-b border-border flex items-center gap-3">
+              <BarChart3 className="w-5 h-5 text-primary" />
+              <h2 className="font-bold text-foreground">Budget vs Actuals — {periodLabel}</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/30 text-muted-foreground">
+                    <th className="text-left px-5 py-3 font-semibold">Account</th>
+                    <th className="text-right px-5 py-3 font-semibold">Budget</th>
+                    <th className="text-right px-5 py-3 font-semibold">Actual</th>
+                    <th className="text-right px-5 py-3 font-semibold">Variance</th>
+                    <th className="text-right px-5 py-3 font-semibold">% Var</th>
+                    <th className="text-left px-5 py-3 font-semibold w-40">Progress</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {budgets.map((b) => {
+                    const pct = b.amount > 0 ? Math.min(100, (b.actual / b.amount) * 100) : 0;
+                    const isOver = b.variancePct > 10;
+                    return (
+                      <tr key={b.id} className="border-t border-border hover:bg-muted/20">
+                        <td className="px-5 py-3.5 font-medium text-foreground">{b.account.name}</td>
+                        <td className="px-5 py-3.5 text-right font-mono">{fmt(b.amount)}</td>
+                        <td className="px-5 py-3.5 text-right font-mono font-semibold">{fmt(b.actual)}</td>
+                        <td className={`px-5 py-3.5 text-right font-mono ${b.variance > 0 ? 'text-red-500' : 'text-emerald-500'}`}>
+                          {b.variance > 0 ? '+' : ''}{fmt(b.variance)}
+                        </td>
+                        <td className={`px-5 py-3.5 text-right font-semibold ${isOver ? 'text-red-500' : 'text-muted-foreground'}`}>
+                          {b.variancePct > 0 ? '+' : ''}{b.variancePct.toFixed(1)}%
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <div className="h-2 bg-muted rounded-full overflow-hidden w-full">
+                            <div
+                              className={`h-full rounded-full transition-all ${pct >= 100 ? 'bg-red-500' : pct >= 80 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-muted-foreground">{pct.toFixed(0)}%</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
