@@ -174,6 +174,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { ThemeToggle } from './theme-toggle';
 import {
   BarChart3,
   TrendingUp,
@@ -324,9 +325,14 @@ const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-export function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+interface SidebarProps {
+  isCollapsed: boolean;
+  toggleCollapse: () => void;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+}
+
+export function Sidebar({ isCollapsed, toggleCollapse, isOpen, setIsOpen }: SidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>(['Dashboard']);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
@@ -338,29 +344,8 @@ export function Sidebar() {
     );
   };
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
   return (
     <>
-      {/* Mobile Menu Button */}
-      <button
-        onClick={toggleSidebar}
-        className="fixed top-4 left-4 z-50 md:hidden p-2.5 hover:bg-sidebar-accent/20 rounded-lg transition-all duration-200 ease-out"
-        aria-label="Toggle menu"
-      >
-        {isOpen ? (
-          <X className="w-6 h-6 text-sidebar-foreground" />
-        ) : (
-          <Menu className="w-6 h-6 text-sidebar-foreground" />
-        )}
-      </button>
-
       {/* Sidebar Overlay */}
       {isOpen && (
         <div
@@ -522,7 +507,8 @@ export function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-sidebar-border/50 px-4 py-4 mt-auto">
+        <div className="border-t border-sidebar-border/50 px-4 py-4 mt-auto flex flex-col gap-3">
+          <ThemeToggle isCollapsed={isCollapsed} />
           <div
             className="px-3 py-3 rounded-lg bg-sidebar-accent/15 border border-sidebar-accent/30"
             style={{
@@ -547,12 +533,6 @@ export function Sidebar() {
           </div>
         </div>
       </aside>
-
-      {/* Main Content Spacer */}
-      <div
-        className={`${isCollapsed ? 'md:ml-24' : 'md:ml-72'
-          } transition-all duration-300`}
-      />
     </>
   );
 }
