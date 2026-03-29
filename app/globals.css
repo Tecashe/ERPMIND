@@ -1,0 +1,1567 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   TYPEFACES — Precision-cut, authority-grade
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
+
+/* ============================================================
+   DESIGN TOKENS — The source of truth
+   ============================================================ */
+:root {
+  /* --- Chromatic foundation --- */
+  /* Obsidian light: drawn from volcanic stone + Kenyan lava rock */
+  --obsidian-950: #07080c;
+  --obsidian-900: #0d0f17;
+  --obsidian-850: #111420;
+  --obsidian-800: #161b2a;
+  --obsidian-750: #1c2235;
+  --obsidian-700: #232a40;
+  --obsidian-600: #2e3854;
+  --obsidian-500: #4a5470;
+  --obsidian-400: #6b7594;
+  --obsidian-300: #9aa3bc;
+  --obsidian-200: #c8cedf;
+  --obsidian-100: #e8ebf3;
+  --obsidian-50: #f4f5f9;
+
+  /* Savanna gold: the light over the Rift Valley at 5pm */
+  --gold-950: #1a1100;
+  --gold-900: #2e1e00;
+  --gold-800: #4d3300;
+  --gold-700: #7a5200;
+  --gold-600: #a36e00;
+  --gold-500: #c98a00;
+  --gold-400: #dfa832;
+  --gold-300: #eec460;
+  --gold-200: #f5d98a;
+  --gold-100: #faefc8;
+  --gold-50: #fdf8eb;
+
+  /* Nairobi green: deep forest, not lime */
+  --forest-900: #061a0e;
+  --forest-800: #0e3020;
+  --forest-700: #134d33;
+  --forest-600: #186641;
+  --forest-500: #1d7d4f;
+  --forest-400: #2a9e67;
+  --forest-300: #4db882;
+  --forest-200: #86d4aa;
+  --forest-100: #c2ecd6;
+  --forest-50: #edfaf4;
+
+  /* Signal red */
+  --signal-900: #1a0404;
+  --signal-700: #7f1d1d;
+  --signal-500: #c81e1e;
+  --signal-400: #ef4444;
+  --signal-200: #fca5a5;
+  --signal-100: #fee2e2;
+
+  /* Pure poles */
+  --pure-white: #ffffff;
+  --pure-black: #000000;
+
+  /* --- Semantic layer (light mode) --- */
+  --background: var(--obsidian-50);
+  --background-subtle: #f0f1f7;
+  --foreground: var(--obsidian-900);
+  --foreground-muted: var(--obsidian-500);
+  --foreground-faint: var(--obsidian-300);
+
+  --surface: var(--pure-white);
+  --surface-raised: var(--pure-white);
+  --surface-overlay: rgba(255, 255, 255, 0.92);
+
+  --card: var(--pure-white);
+  --card-foreground: var(--obsidian-900);
+  --popover: var(--pure-white);
+  --popover-foreground: var(--obsidian-900);
+
+  --primary: var(--obsidian-900);
+  --primary-foreground: var(--pure-white);
+
+  --secondary: var(--gold-500);
+  --secondary-foreground: var(--pure-white);
+
+  --accent: var(--forest-500);
+  --accent-foreground: var(--pure-white);
+
+  --muted: var(--obsidian-50);
+  --muted-foreground: var(--obsidian-400);
+
+  --destructive: var(--signal-500);
+  --destructive-foreground: var(--pure-white);
+
+  --border: var(--obsidian-100);
+  --border-strong: var(--obsidian-200);
+  --input: var(--pure-white);
+  --ring: var(--obsidian-900);
+
+  /* Chart palette */
+  --chart-1: var(--obsidian-800);
+  --chart-2: var(--gold-400);
+  --chart-3: var(--forest-400);
+  --chart-4: var(--obsidian-400);
+  --chart-5: var(--gold-200);
+
+  /* Sidebar */
+  --sidebar: var(--obsidian-900);
+  --sidebar-foreground: var(--obsidian-100);
+  --sidebar-primary: var(--gold-400);
+  --sidebar-primary-foreground: var(--obsidian-950);
+  --sidebar-accent: var(--obsidian-750);
+  --sidebar-accent-foreground: var(--obsidian-100);
+  --sidebar-border: var(--obsidian-700);
+  --sidebar-ring: var(--gold-400);
+
+  /* --- Geometry --- */
+  --radius: 0.5rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.625rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  /* --- Elevation shadows (light) --- */
+  --shadow-xs: 0 1px 2px rgba(13, 15, 23, 0.06);
+  --shadow-sm: 0 1px 3px rgba(13, 15, 23, 0.08), 0 1px 2px rgba(13, 15, 23, 0.04);
+  --shadow-md: 0 4px 12px rgba(13, 15, 23, 0.08), 0 2px 4px rgba(13, 15, 23, 0.04);
+  --shadow-lg: 0 8px 24px rgba(13, 15, 23, 0.10), 0 4px 8px rgba(13, 15, 23, 0.06);
+  --shadow-xl: 0 16px 48px rgba(13, 15, 23, 0.12), 0 8px 16px rgba(13, 15, 23, 0.06);
+
+  /* --- Motion --- */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 350ms;
+  --duration-enter: 500ms;
+
+  /* --- Typography scale --- */
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-serif: 'DM Serif Display', Georgia, serif;
+  --font-mono: 'DM Mono', 'Fira Code', monospace;
+
+  /* Fine-tuned letter spacing */
+  --tracking-tightest: -0.04em;
+  --tracking-tighter: -0.025em;
+  --tracking-tight: -0.015em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.08em;
+  --tracking-widest: 0.12em;
+}
+
+/* ============================================================
+   DARK THEME — The primary premium experience
+   This is where the design truly lives
+   ============================================================ */
+.dark {
+  --background: var(--obsidian-900);
+  --background-subtle: var(--obsidian-850);
+  --foreground: var(--obsidian-50);
+  --foreground-muted: var(--obsidian-300);
+  --foreground-faint: var(--obsidian-500);
+
+  --surface: var(--obsidian-850);
+  --surface-raised: var(--obsidian-800);
+  --surface-overlay: rgba(17, 20, 32, 0.95);
+
+  --card: var(--obsidian-850);
+  --card-foreground: var(--obsidian-50);
+  --popover: var(--obsidian-800);
+  --popover-foreground: var(--obsidian-100);
+
+  --primary: var(--obsidian-50);
+  --primary-foreground: var(--obsidian-900);
+
+  --secondary: var(--gold-400);
+  --secondary-foreground: var(--obsidian-950);
+
+  --accent: var(--forest-300);
+  --accent-foreground: var(--obsidian-950);
+
+  --muted: var(--obsidian-800);
+  --muted-foreground: var(--obsidian-400);
+
+  --destructive: var(--signal-400);
+  --destructive-foreground: var(--obsidian-950);
+
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --input: var(--obsidian-800);
+  --ring: var(--gold-400);
+
+  --chart-1: var(--obsidian-100);
+  --chart-2: var(--gold-300);
+  --chart-3: var(--forest-300);
+  --chart-4: var(--obsidian-400);
+  --chart-5: var(--gold-500);
+
+  --sidebar: var(--obsidian-950);
+  --sidebar-foreground: var(--obsidian-200);
+  --sidebar-primary: var(--gold-400);
+  --sidebar-primary-foreground: var(--obsidian-950);
+  --sidebar-accent: var(--obsidian-850);
+  --sidebar-accent-foreground: var(--obsidian-100);
+  --sidebar-border: rgba(255, 255, 255, 0.05);
+  --sidebar-ring: var(--gold-400);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.20);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.40), 0 2px 4px rgba(0, 0, 0, 0.20);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.50), 0 4px 8px rgba(0, 0, 0, 0.25);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.60), 0 8px 16px rgba(0, 0, 0, 0.30);
+}
+
+/* ============================================================
+   TAILWIND THEME BRIDGE
+   ============================================================ */
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ============================================================
+   BASE LAYER — The bones of everything
+   ============================================================ */
+@layer base {
+
+  /* --- Global reset refinements --- */
+  *,
+  *::before,
+  *::after {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1, 'ss02' 1;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    letter-spacing: -0.005em;
+    font-weight: 400;
+    min-height: 100dvh;
+  }
+
+  /* --- Premium selection colour --- */
+  ::selection {
+    background: var(--gold-400);
+    color: var(--obsidian-950);
+  }
+
+  /* --- Scrollbar — thin and refined --- */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--obsidian-300);
+    border-radius: 100px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: var(--obsidian-600);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--gold-400);
+  }
+
+  /* --- Focus ring — precise, not chunky --- */
+  :focus-visible {
+    outline: 1.5px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* ======================================
+     TYPOGRAPHY — The voice of the brand
+     ====================================== */
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    /* DM Serif Display is italic-capable; let it breathe */
+    line-height: 1.15;
+    letter-spacing: var(--tracking-tight);
+    color: var(--foreground);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    letter-spacing: var(--tracking-tighter);
+    line-height: 1.08;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  h3 {
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+  }
+
+  h4 {
+    font-size: 1.125rem;
+  }
+
+  h5 {
+    font-size: 1rem;
+    font-family: var(--font-sans);
+    font-weight: 600;
+  }
+
+  h6 {
+    font-size: 0.875rem;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--foreground-muted);
+  }
+
+  p {
+    line-height: 1.7;
+    color: var(--foreground);
+  }
+
+  p.lead {
+    font-size: 1.125rem;
+    font-weight: 300;
+    color: var(--muted-foreground);
+    line-height: 1.65;
+  }
+
+  /* Eyebrow / overline text */
+  .text-overline {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-widest);
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  small,
+  .text-small {
+    font-size: 0.8125rem;
+    letter-spacing: 0.005em;
+  }
+
+  code,
+  kbd,
+  pre {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+  }
+
+  code {
+    background: var(--muted);
+    color: var(--secondary);
+    padding: 0.125em 0.4em;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+  }
+
+  /* Tabular numbers for financial data — critical for an ERP */
+  .tabular,
+  .font-mono,
+  td.numeric,
+  th.numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: 0;
+  }
+
+  /* --- Horizontal rules — architectural, not decorative --- */
+  hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+    margin: 2rem 0;
+  }
+
+  /* --- Links --- */
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-quart);
+  }
+
+  /* --- Table base — ERP tables need to be perfect --- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  thead th {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-widest);
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr {
+    transition: background var(--duration-fast) var(--ease-out-quart);
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background: var(--muted);
+  }
+
+  tbody td {
+    padding: 0.875rem 0;
+    font-size: 0.9rem;
+    vertical-align: middle;
+  }
+
+  /* --- Input base --- */
+  input,
+  textarea,
+  select {
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    background: var(--input);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    transition:
+      border-color var(--duration-fast) var(--ease-out-quart),
+      box-shadow var(--duration-fast) var(--ease-out-quart);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 15%, transparent);
+    outline: none;
+  }
+}
+
+/* ============================================================
+   COMPONENTS — The arsenal of premium UI
+   ============================================================ */
+@layer components {
+
+  /* ==========================================
+     CARD SYSTEM
+     The workhorse of the ERP interface
+     ========================================== */
+
+  .card-premium {
+    background: var(--card);
+    color: var(--card-foreground);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    transition:
+      box-shadow var(--duration-base) var(--ease-out-quart),
+      border-color var(--duration-base) var(--ease-out-quart),
+      transform var(--duration-base) var(--ease-out-quart);
+  }
+
+  /* The signature: a hairline gold top-edge on hover */
+  .card-premium::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 10%, var(--gold-400) 50%, transparent 90%);
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out-quart);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .card-premium:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
+  }
+
+  .card-premium:hover::before {
+    opacity: 1;
+  }
+
+  /* Stat card variant — for KPI numbers */
+  .card-stat {
+    @apply card-premium;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .card-stat .stat-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-widest);
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  .card-stat .stat-value {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    line-height: 1;
+    letter-spacing: var(--tracking-tighter);
+    color: var(--foreground);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card-stat .stat-delta {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .card-stat .stat-delta.positive {
+    color: var(--forest-400);
+  }
+
+  .card-stat .stat-delta.negative {
+    color: var(--signal-400);
+  }
+
+  /* ==========================================
+     BUTTON SYSTEM
+     ========================================== */
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition:
+      transform var(--duration-fast) var(--ease-spring),
+      box-shadow var(--duration-base) var(--ease-out-quart),
+      background var(--duration-fast) var(--ease-out-quart);
+  }
+
+  /* Shimmer on hover */
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.12) 50%, transparent 60%);
+    transform: translateX(-100%);
+    transition: transform 0.4s var(--ease-out-expo);
+    pointer-events: none;
+  }
+
+  .btn-primary:hover::after {
+    transform: translateX(100%);
+  }
+
+  .btn-primary:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-xs);
+  }
+
+  /* Gold accent button — for primary CTAs */
+  .btn-gold {
+    @apply btn-primary;
+    background: var(--gold-500);
+    color: var(--obsidian-950);
+    border-color: var(--gold-400);
+    font-weight: 600;
+  }
+
+  .btn-gold:hover {
+    background: var(--gold-400);
+    box-shadow: 0 4px 16px rgba(201, 138, 0, 0.30);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: transparent;
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-strong);
+    cursor: pointer;
+    transition:
+      background var(--duration-fast) var(--ease-out-quart),
+      border-color var(--duration-fast) var(--ease-out-quart),
+      transform var(--duration-fast) var(--ease-spring);
+  }
+
+  .btn-secondary:hover {
+    background: var(--muted);
+    border-color: var(--border);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary:active {
+    transform: translateY(0);
+  }
+
+  .btn-outline {
+    @apply btn-secondary;
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    background: transparent;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition:
+      background var(--duration-fast) var(--ease-out-quart),
+      color var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .btn-ghost:hover {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+
+  /* Icon button */
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition:
+      background var(--duration-fast) var(--ease-out-quart),
+      color var(--duration-fast) var(--ease-out-quart),
+      border-color var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .btn-icon:hover {
+    background: var(--muted);
+    color: var(--foreground);
+    border-color: var(--border-strong);
+  }
+
+  /* Sizes */
+  .btn-sm {
+    padding: 0.4rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+
+  .btn-lg {
+    padding: 0.8rem 1.75rem;
+    font-size: 1rem;
+  }
+
+  /* ==========================================
+     BADGE SYSTEM — Status indicators
+     ========================================== */
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.625rem;
+    border-radius: 100px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .badge::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  .badge-success {
+    @apply badge;
+    background: color-mix(in srgb, var(--forest-400) 12%, transparent);
+    color: var(--forest-400);
+    border: 1px solid color-mix(in srgb, var(--forest-400) 20%, transparent);
+  }
+
+  .badge-warning {
+    @apply badge;
+    background: color-mix(in srgb, var(--gold-400) 12%, transparent);
+    color: var(--gold-500);
+    border: 1px solid color-mix(in srgb, var(--gold-400) 20%, transparent);
+  }
+
+  .badge-danger {
+    @apply badge;
+    background: color-mix(in srgb, var(--signal-400) 12%, transparent);
+    color: var(--signal-400);
+    border: 1px solid color-mix(in srgb, var(--signal-400) 20%, transparent);
+  }
+
+  .badge-neutral {
+    @apply badge;
+    background: var(--muted);
+    color: var(--muted-foreground);
+    border: 1px solid var(--border);
+  }
+
+  .badge-primary {
+    @apply badge;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    border: 1px solid transparent;
+  }
+
+  /* ==========================================
+     INPUT SYSTEM
+     ========================================== */
+
+  .input-field {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    background: var(--input);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    transition:
+      border-color var(--duration-fast) var(--ease-out-quart),
+      box-shadow var(--duration-fast) var(--ease-out-quart),
+      background var(--duration-fast) var(--ease-out-quart);
+    -webkit-appearance: none;
+  }
+
+  .input-field::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.7;
+  }
+
+  .input-field:hover {
+    border-color: var(--border-strong);
+  }
+
+  .input-field:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary) 15%, transparent);
+    outline: none;
+    background: var(--surface-raised);
+  }
+
+  .input-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    margin-bottom: 0.375rem;
+    letter-spacing: 0.01em;
+  }
+
+  /* ==========================================
+     DATA TABLE — The crown jewel of an ERP
+     ========================================== */
+
+  .data-table-container {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  .data-table thead {
+    background: var(--muted);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  .data-table thead th {
+    padding: 0.75rem 1rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-widest);
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .data-table thead th.numeric {
+    text-align: right;
+  }
+
+  .data-table tbody td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    transition: background var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .data-table tbody td.numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+
+  .data-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .data-table tbody tr:hover td {
+    background: color-mix(in srgb, var(--secondary) 5%, var(--muted));
+  }
+
+  /* Row selection highlight */
+  .data-table tbody tr.selected td {
+    background: color-mix(in srgb, var(--secondary) 8%, transparent);
+    border-color: color-mix(in srgb, var(--secondary) 20%, transparent);
+  }
+
+  /* ==========================================
+     SIDEBAR COMPONENTS
+     ========================================== */
+
+  .sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--sidebar-foreground);
+    text-decoration: none;
+    transition:
+      background var(--duration-fast) var(--ease-out-quart),
+      color var(--duration-fast) var(--ease-out-quart),
+      padding-left var(--duration-fast) var(--ease-out-quart);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .sidebar-nav-item:hover {
+    background: var(--sidebar-accent);
+    color: var(--sidebar-accent-foreground);
+    padding-left: 1.125rem;
+  }
+
+  /* The gold left-rail on active items */
+  .sidebar-nav-item.active {
+    background: var(--sidebar-accent);
+    color: var(--sidebar-primary);
+    font-weight: 500;
+    padding-left: 1.125rem;
+  }
+
+  .sidebar-nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 20%;
+    height: 60%;
+    width: 2px;
+    background: var(--sidebar-primary);
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* ==========================================
+     PAGE LAYOUT HELPERS
+     ========================================== */
+
+  .page-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .page-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    font-weight: 400;
+    letter-spacing: var(--tracking-tighter);
+    color: var(--foreground);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.9375rem;
+    color: var(--muted-foreground);
+    font-weight: 300;
+    letter-spacing: 0.01em;
+  }
+
+  /* ==========================================
+     DIVIDERS & SEPARATORS
+     ========================================== */
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.5rem 0;
+  }
+
+  .divider-labeled {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .divider-labeled::before,
+  .divider-labeled::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ==========================================
+     LOADING & SKELETON
+     ========================================== */
+
+  @keyframes skeleton-shimmer {
+    0% {
+      background-position: -400px 0;
+    }
+
+    100% {
+      background-position: 400px 0;
+    }
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg,
+        var(--muted) 25%,
+        color-mix(in srgb, var(--muted) 50%, var(--border)) 50%,
+        var(--muted) 75%);
+    background-size: 800px 100%;
+    animation: skeleton-shimmer 1.6s ease-in-out infinite;
+    border-radius: var(--radius-sm);
+  }
+
+  /* ==========================================
+     TOAST / NOTIFICATION
+     ========================================== */
+
+  .toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    font-size: 0.875rem;
+    max-width: 22rem;
+  }
+
+  .toast-success {
+    border-left: 3px solid var(--forest-400);
+  }
+
+  .toast-warning {
+    border-left: 3px solid var(--gold-400);
+  }
+
+  .toast-error {
+    border-left: 3px solid var(--signal-400);
+  }
+
+  /* ==========================================
+     TOOLTIP
+     ========================================== */
+
+  .tooltip {
+    background: var(--obsidian-900);
+    color: var(--obsidian-100);
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    box-shadow: var(--shadow-lg);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .dark .tooltip {
+    background: var(--obsidian-700);
+    border: 1px solid var(--obsidian-600);
+  }
+
+  /* ==========================================
+     FINANCIAL AMOUNT DISPLAY
+     Critical for an ERP — numbers must be
+     immediately scannable
+     ========================================== */
+
+  .amount {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    font-weight: 500;
+  }
+
+  .amount-positive {
+    color: var(--forest-400);
+  }
+
+  .amount-negative {
+    color: var(--signal-400);
+  }
+
+  .amount-neutral {
+    color: var(--foreground);
+  }
+
+  .amount-large {
+    @apply amount;
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    line-height: 1;
+    letter-spacing: var(--tracking-tighter);
+  }
+
+  /* Currency prefix */
+  .amount-kes::before {
+    content: 'KES ';
+    font-size: 0.75em;
+    font-weight: 400;
+    font-family: var(--font-sans);
+    letter-spacing: var(--tracking-wide);
+    color: var(--muted-foreground);
+    margin-right: 0.1em;
+  }
+
+  /* ==========================================
+     PROGRESS / METRIC BARS
+     ========================================== */
+
+  .metric-bar-track {
+    height: 4px;
+    background: var(--muted);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .metric-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--secondary), var(--gold-300));
+    transition: width 0.8s var(--ease-out-expo);
+  }
+
+  .metric-bar-fill.success {
+    background: linear-gradient(90deg, var(--forest-500), var(--forest-300));
+  }
+
+  .metric-bar-fill.danger {
+    background: linear-gradient(90deg, var(--signal-500), var(--signal-400));
+  }
+
+  /* ==========================================
+     MODAL / DIALOG
+     ========================================== */
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 8, 12, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-content {
+    background: var(--card);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    width: 100%;
+    max-width: 32rem;
+    max-height: 90dvh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .modal-header {
+    padding: 1.5rem 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .modal-footer {
+    padding: 1rem 1.5rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ==========================================
+     EMPTY STATES
+     ========================================== */
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-xl);
+    background: repeating-linear-gradient(45deg,
+        transparent,
+        transparent 10px,
+        color-mix(in srgb, var(--border) 30%, transparent) 10px,
+        color-mix(in srgb, var(--border) 30%, transparent) 11px);
+  }
+
+  .empty-state-icon {
+    width: 3rem;
+    height: 3rem;
+    color: var(--muted-foreground);
+    margin-bottom: 1.25rem;
+    opacity: 0.5;
+  }
+
+  .empty-state-title {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state-description {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    max-width: 28ch;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ==========================================
+     SECTION HEADERS — Inside cards
+     ========================================== */
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-weight: 400;
+    letter-spacing: var(--tracking-tight);
+    color: var(--foreground);
+  }
+
+  /* ==========================================
+     ICON CONTAINERS
+     ========================================== */
+
+  .icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+  }
+
+  .icon-container-sm {
+    @apply icon-container;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .icon-container-lg {
+    @apply icon-container;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-lg);
+  }
+
+  /* Colour variants */
+  .icon-primary {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--primary);
+  }
+
+  .icon-gold {
+    background: color-mix(in srgb, var(--secondary) 12%, transparent);
+    color: var(--secondary);
+  }
+
+  .icon-success {
+    background: color-mix(in srgb, var(--forest-400) 12%, transparent);
+    color: var(--forest-400);
+  }
+
+  .icon-danger {
+    background: color-mix(in srgb, var(--signal-400) 12%, transparent);
+    color: var(--signal-400);
+  }
+
+  .icon-muted {
+    background: var(--muted);
+    color: var(--muted-foreground);
+  }
+}
+
+/* ============================================================
+   UTILITIES — Surgical one-purpose classes
+   ============================================================ */
+@layer utilities {
+
+  /* Glass morphism — for overlays */
+  .glass {
+    background: var(--surface-overlay);
+    backdrop-filter: blur(12px) saturate(1.4);
+    -webkit-backdrop-filter: blur(12px) saturate(1.4);
+    border: 1px solid var(--border);
+  }
+
+  /* Premium gradient text — for display moments */
+  .text-gradient-gold {
+    background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-300) 50%, var(--gold-400) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-dark {
+    background: linear-gradient(135deg, var(--foreground) 0%, var(--muted-foreground) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Truncation */
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Fade edges for scrollable content */
+  .fade-right {
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+
+  /* Number animation helper */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+}
+
+/* ============================================================
+   ANIMATIONS — Purposeful, not decorative
+   ============================================================ */
+
+/* Page-level entrance — stagger children with animation-delay */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-gold {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold-400) 40%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--gold-400) 0%, transparent);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s var(--ease-out-expo) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s var(--ease-out-quart) both;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.25s var(--ease-out-expo) both;
+}
+
+.animate-slide-right {
+  animation: slide-in-right 0.35s var(--ease-out-expo) both;
+}
+
+/* Stagger helpers */
+.delay-75 {
+  animation-delay: 75ms;
+}
+
+.delay-150 {
+  animation-delay: 150ms;
+}
+
+.delay-225 {
+  animation-delay: 225ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-375 {
+  animation-delay: 375ms;
+}
+
+.delay-450 {
+  animation-delay: 450ms;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   DARK MODE SURFACE TEXTURE
+   The subtle noise that makes dark backgrounds feel physical
+   ============================================================ */
+
+.dark body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.018;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: overlay;
+}
+
+/* ============================================================
+   PRINT — Financial documents need to print cleanly
+   ============================================================ */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+    font-size: 11pt;
+  }
+
+  .card-premium {
+    border: 1px solid #ddd;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .sidebar-nav-item {
+    display: none;
+  }
+
+  table {
+    font-size: 9pt;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+}

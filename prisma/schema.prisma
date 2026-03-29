@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── HR MODULE ────────────────────────────────────────────────────────────────
+
+model Employee {
+  id           String      @id @default(cuid())
+  name         String
+  email        String      @unique
+  role         String      @default("STAFF") // ADMIN, MANAGER, STAFF
+  department   String
+  salary       Float
+  hiredAt      DateTime    @default(now())
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  payrolls     Payroll[]
+}
+
+model Payroll {
+  id               String          @id @default(cuid())
+  employee         Employee        @relation(fields: [employeeId], references: [id])
+  employeeId       String
+  amount           Float
+  period           String          // e.g. "March 2025"
+  paidAt           DateTime        @default(now())
+  financialRecord  FinancialRecord? @relation(fields: [financialRecordId], references: [id])
+  financialRecordId String?        @unique
+}
+
+// ─── CRM MODULE ───────────────────────────────────────────────────────────────
+
+model Customer {
+  id        String    @id @default(cuid())
+  name      String
+  email     String?   @unique
+  phone     String?
+  company   String?
+  createdAt DateTime  @default(now())
+  sales     Sale[]
+}
+
+// ─── PROCUREMENT MODULE ───────────────────────────────────────────────────────
+
+model Supplier {
+  id             String          @id @default(cuid())
+  name           String
+  email          String?
+  phone          String?
+  address        String?
+  createdAt      DateTime        @default(now())
+  purchaseOrders PurchaseOrder[]
+}
+
+model PurchaseOrder {
+  id                String          @id @default(cuid())
+  supplier          Supplier        @relation(fields: [supplierId], references: [id])
+  supplierId        String
+  product           Product?        @relation(fields: [productId], references: [id])
+  productId         String?
+  rawMaterial       RawMaterial?    @relation(fields: [rawMaterialId], references: [id])
+  rawMaterialId     String?
+  quantity          Float
+  unitCostKES       Float
+  totalCostKES      Float
+  status            String          @default("PENDING") // PENDING, RECEIVED, CANCELLED
+  createdAt         DateTime        @default(now())
+  receivedAt        DateTime?
+  financialRecord   FinancialRecord? @relation(fields: [financialRecordId], references: [id])
+  financialRecordId String?         @unique
+}
+
+// ─── INVENTORY MODULE ─────────────────────────────────────────────────────────
+
+model Product {
+  id             String          @id @default(cuid())
+  name           String
+  sku            String          @unique
+  priceKES       Float
+  stockLevel     Int             @default(0)
+  lowStockAlert  Int             @default(5)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  sales          Sale[]
+  purchaseOrders PurchaseOrder[]
+  productionRuns ProductionRun[]
+}
+
+model RawMaterial {
+  id             String          @id @default(cuid())
+  name           String
+  unit           String          // e.g. "kg", "liters", "units"
+  stockLevel     Float           @default(0)
+  lowStockAlert  Float           @default(10)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  purchaseOrders PurchaseOrder[]
+  productionRuns ProductionRunMaterial[]
+}
+
+// ─── PRODUCTION MODULE ────────────────────────────────────────────────────────
+
+model ProductionRun {
+  id            String                  @id @default(cuid())
+  product       Product                 @relation(fields: [productId], references: [id])
+  productId     String
+  quantityMade  Int
+  notes         String?
+  createdAt     DateTime                @default(now())
+  materials     ProductionRunMaterial[]
+}
+
+model ProductionRunMaterial {
+  id              String        @id @default(cuid())
+  productionRun   ProductionRun @relation(fields: [productionRunId], references: [id])
+  productionRunId String
+  rawMaterial     RawMaterial   @relation(fields: [rawMaterialId], references: [id])
+  rawMaterialId   String
+  quantityUsed    Float
+}
+
+// ─── SALES MODULE ─────────────────────────────────────────────────────────────
+
+model Sale {
+  id                String           @id @default(cuid())
+  product           Product          @relation(fields: [productId], references: [id])
+  productId         String
+  customer          Customer?        @relation(fields: [customerId], references: [id])
+  customerId        String?
+  quantity          Int
+  totalAmount       Float
+  vatAmount         Float
+  status            String           @default("PAID") // PAID, PENDING
+  saleDate          DateTime         @default(now())
+  financialRecord   FinancialRecord? @relation(fields: [financialRecordId], references: [id])
+  financialRecordId String?          @unique
+}
+
+// ─── FINANCE MODULE ───────────────────────────────────────────────────────────
+
+model FinancialRecord {
+  id            String         @id @default(cuid())
+  type          String         // INCOME, EXPENSE
+  amount        Float
+  description   String
+  category      String         @default("GENERAL") // SALES, PAYROLL, PROCUREMENT, GENERAL
+  date          DateTime       @default(now())
+  // Back-relations for full audit trail
+  sale          Sale?
+  purchaseOrder PurchaseOrder?
+  payroll       Payroll?
+}
+
+// ─── AUTHENTICATION MODULE ────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("USER") // ADMIN, USER
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
