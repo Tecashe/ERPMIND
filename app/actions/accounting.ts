@@ -68,6 +68,7 @@ export async function getTrialBalance() {
   })
 }
 
+
 export async function getProfitAndLoss(startDate?: Date, endDate?: Date) {
   const where = startDate && endDate
     ? { entryDate: { gte: startDate, lte: endDate } }
