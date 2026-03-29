@@ -4,10 +4,20 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import { Search, Bell, Menu, UserCircle, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useSession } from 'next-auth/react';
 
 export function Navbar({ toggleMobile }: { toggleMobile: () => void }) {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const { data: session } = useSession();
+  
+  const userName = session?.user?.name || session?.user?.email?.split('@')[0] || 'User';
+  const initials = userName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
   
   // Create breadcrumb from pathname roughly
   const pathSegments = pathname.split('/').filter(Boolean);
