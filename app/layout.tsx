@@ -12,23 +12,7 @@ export const metadata: Metadata = {
   title: 'Nexus Kenya - Enterprise Resource Planning',
   description: 'Premium ERP solution designed specifically for the Kenyan market with M-Pesa integration, VAT compliance, multi-currency support, and local banking connectivity.',
   generator: 'Nexus Kenya',
-  // icons: {
-  //   icon: [
-  //     {
-  //       url: '/icon-light-32x32.png',
-  //       media: '(prefers-color-scheme: light)',
-  //     },
-  //     {
-  //       url: '/icon-dark-32x32.png',
-  //       media: '(prefers-color-scheme: dark)',
-  //     },
-  //     {
-  //       url: '/icon.svg',
-  //       type: 'image/svg+xml',
-  //     },
-  //   ],
-  //   apple: '/apple-icon.png',
-  // },
+
 }
 
 export default function RootLayout({
