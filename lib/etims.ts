@@ -1,5 +1,3 @@
-'use server'
-
 /**
  * KRA eTIMS OSCU Integration Service
  * Supports sandbox and production modes via env vars.

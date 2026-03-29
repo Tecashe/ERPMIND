@@ -4,7 +4,11 @@ import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 
 // Re-export accounting actions for backward compat
-export { getInvoices } from '@/app/actions/accounting'
+import { getInvoices as _getInvoices } from '@/app/actions/accounting'
+
+export async function getInvoices() {
+  return _getInvoices()
+}
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 
