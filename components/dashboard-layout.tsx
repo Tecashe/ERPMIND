@@ -1,18 +1,22 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Sidebar } from './sidebar';
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-background">
-      <Sidebar />
-      <main className="md:ml-64 p-4 md:p-8">
-        {children}
+    <div className="min-h-screen bg-background flex">
+      <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <main 
+        className={`flex-1 min-w-0 transition-all duration-300 ease-in-out p-4 md:p-8 ${
+          isCollapsed ? 'md:ml-20' : 'md:ml-64'
+        }`}
+      >
+        <div className="animate-in fade-in duration-500">
+          {children}
+        </div>
       </main>
     </div>
   );
