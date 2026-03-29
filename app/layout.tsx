@@ -9,9 +9,9 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'ProERP Kenya - Enterprise Resource Planning',
+  title: 'Nexus Kenya - Enterprise Resource Planning',
   description: 'Premium ERP solution designed specifically for the Kenyan market with M-Pesa integration, VAT compliance, multi-currency support, and local banking connectivity.',
-  generator: 'ProERP Kenya',
+  generator: 'Nexus Kenya',
   icons: {
     icon: [
       {

@@ -10,7 +10,7 @@ export function Navbar({ toggleMobile }: { toggleMobile: () => void }) {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { data: session } = useSession();
-  
+
   const userName = session?.user?.name || session?.user?.email?.split('@')[0] || 'User';
   const initials = userName
     .split(' ')
@@ -18,33 +18,33 @@ export function Navbar({ toggleMobile }: { toggleMobile: () => void }) {
     .join('')
     .substring(0, 2)
     .toUpperCase();
-  
+
   // Create breadcrumb from pathname roughly
   const pathSegments = pathname.split('/').filter(Boolean);
-  const currentPage = pathSegments.length > 0 
+  const currentPage = pathSegments.length > 0
     ? pathSegments[pathSegments.length - 1].charAt(0).toUpperCase() + pathSegments[pathSegments.length - 1].slice(1)
     : 'Dashboard';
 
   return (
     <header className="sticky top-0 z-20 h-16 w-full glass border-b border-border/50 flex flex-shrink-0 items-center justify-between px-4 md:px-8">
-      
+
       <div className="flex items-center gap-4">
         {/* Mobile trigger */}
-        <button 
+        <button
           onClick={toggleMobile}
           className="md:hidden btn-icon"
           aria-label="Open Sidebar"
         >
           <Menu className="w-5 h-5 text-foreground" />
         </button>
-        
+
         {/* Breadcrumb / Title */}
         <div className="flex flex-col">
           <h2 className="text-sm md:text-lg font-serif font-medium text-foreground tracking-tight leading-none truncate delay-75 animate-slide-right">
             {currentPage.replace('-', ' ')}
           </h2>
           <span className="hidden sm:inline-block text-[10px] md:text-xs font-semibold text-muted-foreground tracking-wider uppercase mt-1">
-            ProERP Workspace
+            Nexus Workspace
           </span>
         </div>
       </div>
@@ -53,9 +53,9 @@ export function Navbar({ toggleMobile }: { toggleMobile: () => void }) {
         {/* Search */}
         <div className="relative hidden md:flex items-center group">
           <Search className="absolute left-3 w-4 h-4 text-muted-foreground group-focus-within:text-gold-500 transition-colors" />
-          <input 
-            type="text" 
-            placeholder="Search everything..." 
+          <input
+            type="text"
+            placeholder="Search everything..."
             className="input-field pl-9 h-9 w-40 lg:w-64 text-sm rounded-full bg-surface border border-border focus:border-gold-400 focus:w-48 lg:focus:w-72 transition-all duration-300 ease-smooth"
           />
         </div>
@@ -66,7 +66,7 @@ export function Navbar({ toggleMobile }: { toggleMobile: () => void }) {
         </button>
 
         {/* Theme Toggle */}
-        <button 
+        <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           className="btn-icon rounded-full w-9 h-9 border-none hover:bg-muted/80 relative flex items-center justify-center"
           title="Toggle Theme"

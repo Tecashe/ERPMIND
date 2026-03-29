@@ -91,7 +91,7 @@
 //             </div>
 //             {(!isCollapsed || isOpen) && (
 //               <div className="flex flex-col min-w-0 transition-opacity duration-300">
-//                 <h1 className="text-sm font-bold text-foreground truncate">ProERP</h1>
+//                 <h1 className="text-sm font-bold text-foreground truncate">Nexus</h1>
 //                 <p className="text-xs text-muted-foreground truncate tracking-wide">Kenya</p>
 //               </div>
 //             )}
@@ -389,7 +389,7 @@ export function Sidebar({ isCollapsed, toggleCollapse, isOpen, setIsOpen }: Side
                 </div>
                 <div className="min-w-0">
                   <h1 className="text-base font-bold text-sidebar-foreground truncate">
-                    ProERP
+                    Nexus
                   </h1>
                   <p className="text-xs text-sidebar-foreground/60 truncate">
                     Premium Edition
@@ -520,7 +520,7 @@ export function Sidebar({ isCollapsed, toggleCollapse, isOpen, setIsOpen }: Side
             {!isCollapsed && (
               <>
                 <p className="text-xs font-semibold text-sidebar-foreground">
-                  ProERP Premium
+                  Nexus Premium
                 </p>
                 <p className="text-xs text-sidebar-foreground/60 mt-1">
                   v1.0 • Enterprise Edition
