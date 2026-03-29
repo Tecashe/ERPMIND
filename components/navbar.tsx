@@ -87,9 +87,9 @@ export function Navbar({ toggleMobile }: { toggleMobile: () => void }) {
         {/* Profile Avatar */}
         <button className="flex items-center gap-2 hover:bg-muted/50 p-1.5 pr-3 rounded-full transition-colors border border-transparent hover:border-border">
           <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-gold-500 to-gold-300 flex items-center justify-center shadow-sm">
-            <span className="text-[10px] font-bold text-obsidian-950 tracking-tighter">SM</span>
+            <span className="text-[10px] font-bold text-obsidian-950 tracking-tighter">{initials}</span>
           </div>
-          <span className="hidden sm:block text-xs font-semibold text-foreground tracking-tight">Macharia</span>
+          <span className="hidden sm:block text-xs font-semibold text-foreground tracking-tight">{userName}</span>
         </button>
       </div>
     </header>
