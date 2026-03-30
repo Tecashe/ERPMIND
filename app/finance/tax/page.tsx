@@ -1,33 +1,35 @@
 import React from 'react';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import {
-  FileCheck, AlertCircle, CheckCircle2, Clock, Receipt, Users, Building2, TrendingUp
+  FileCheck, AlertCircle, CheckCircle2, Clock, Receipt, Users, Building2, TrendingUp, Settings
 } from 'lucide-react';
-import { getTaxFilingPeriods } from '@/app/actions/accounting';
+import { getTaxFilingPeriods, getOrganizationSettings } from '@/app/actions/accounting';
 import { getSales } from '@/app/actions';
 import { TaxActions } from '@/components/accounting/tax-actions';
+import Link from 'next/link';
 
 const fmt = (n: number) => `KES ${n.toLocaleString('en-KE', { minimumFractionDigits: 2 })}`;
 
 export default async function TaxCompliancePage() {
-  const [sales, filingPeriods] = await Promise.all([
+  const [sales, filingPeriods, orgSettings] = await Promise.all([
     getSales(),
     getTaxFilingPeriods(),
+    getOrganizationSettings(),
   ]);
 
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-  const paidSales = sales.filter((s) => s.status === 'PAID');
-  const monthSales = paidSales.filter((s) => {
+  const paidSales = sales.filter((s: any) => s.status === 'PAID');
+  const monthSales = paidSales.filter((s: any) => {
     const d = new Date(s.saleDate);
     return d >= startOfMonth && d <= endOfMonth;
   });
 
-  const totalVatAllTime = paidSales.reduce((s, sale) => s + sale.vatAmount, 0);
-  const totalVatMonth = monthSales.reduce((s, sale) => s + sale.vatAmount, 0);
-  const totalRevenueMonth = monthSales.reduce((s, sale) => s + sale.totalAmount, 0);
+  const totalVatAllTime = paidSales.reduce((s: number, sale: any) => s + sale.vatAmount, 0);
+  const totalVatMonth = monthSales.reduce((s: number, sale: any) => s + sale.vatAmount, 0);
+  const totalRevenueMonth = monthSales.reduce((s: number, sale: any) => s + sale.totalAmount, 0);
   const vatRate = 16;
 
   // Filing calendar
@@ -37,7 +39,7 @@ export default async function TaxCompliancePage() {
   const daysToPAYE = Math.ceil((payeDueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
   // Monthly VAT breakdown
-  const byMonth = paidSales.reduce<Record<string, { gross: number; vat: number; count: number }>>((acc, s) => {
+  const byMonth = paidSales.reduce<Record<string, { gross: number; vat: number; count: number }>>((acc, s: any) => {
     const key = new Date(s.saleDate).toLocaleDateString('en-KE', { month: 'long', year: 'numeric' });
     if (!acc[key]) acc[key] = { gross: 0, vat: 0, count: 0 };
     acc[key].gross += s.totalAmount;
@@ -192,31 +194,64 @@ export default async function TaxCompliancePage() {
             </div>
             <div>
               <h2 className="font-bold text-foreground">KRA eTIMS — Electronic Tax Invoicing</h2>
-              <p className="text-xs text-muted-foreground">OSCU Integration · Sandbox Mode Active</p>
+              <p className="text-xs text-muted-foreground">OSCU Integration · {orgSettings.etimsSandbox ? 'Sandbox Mode' : 'Production Mode'}</p>
             </div>
-            <div className="ml-auto">
-              <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-600">
-                Sandbox Mode
+            <div className="ml-auto flex items-center gap-2">
+              <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
+                orgSettings.etimsEnabled
+                  ? 'bg-emerald-500/10 text-emerald-600'
+                  : 'bg-muted text-muted-foreground'
+              }`}>
+                {orgSettings.etimsEnabled ? 'Enabled' : 'Not Enabled'}
               </span>
+              {orgSettings.etimsEnabled && (
+                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
+                  orgSettings.etimsSandbox
+                    ? 'bg-amber-500/10 text-amber-600'
+                    : 'bg-blue-500/10 text-blue-600'
+                }`}>
+                  {orgSettings.etimsSandbox ? 'Sandbox' : 'Production'}
+                </span>
+              )}
             </div>
           </div>
           <div className="p-5 grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { label: 'System', value: 'OSCU (KRA-Hosted)', icon: Building2 },
-              { label: 'KRA PIN', value: process.env.ETIMS_KRA_PIN ?? 'Not configured', icon: CheckCircle2 },
-              { label: 'Device Serial', value: process.env.ETIMS_DEVICE_SERIAL ?? 'Sandbox', icon: FileCheck },
-              { label: 'Mode', value: process.env.ETIMS_SANDBOX === 'false' ? 'Production' : 'Sandbox', icon: AlertCircle },
+              { label: 'KRA PIN', value: orgSettings.kraPin ?? 'Not configured', icon: CheckCircle2 },
+              { label: 'Device Serial', value: orgSettings.etimsDeviceSerial ?? 'Not configured', icon: FileCheck },
+              { label: 'Mode', value: orgSettings.etimsSandbox ? 'Sandbox' : 'Production', icon: AlertCircle },
             ].map((item) => (
               <div key={item.label}>
                 <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
-                <p className="font-mono text-sm font-semibold text-foreground truncate">{item.value}</p>
+                <p className={`font-mono text-sm font-semibold truncate ${
+                  item.value === 'Not configured' ? 'text-red-500' : 'text-foreground'
+                }`}>{item.value}</p>
               </div>
             ))}
           </div>
           <div className="px-5 pb-5">
-            <p className="text-sm text-muted-foreground bg-muted/40 rounded-lg p-3 border border-border">
-              <strong className="text-foreground">Setup required:</strong> Add <code>ETIMS_URL</code>, <code>ETIMS_KRA_PIN</code>, <code>ETIMS_DEVICE_SERIAL</code>, and <code>ETIMS_SANDBOX=false</code> to your <code>.env</code> file when switching to production. Visit <strong>etims.kra.go.ke</strong> to register your device.
-            </p>
+            {(!orgSettings.kraPin || !orgSettings.etimsEnabled) ? (
+              <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-500/30 bg-amber-500/5">
+                <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <p className="text-sm text-amber-700 dark:text-amber-400">
+                  {!orgSettings.kraPin
+                    ? <>KRA PIN not configured. <Link href="/settings/organization" className="underline font-semibold">Set it in Organization Settings →</Link></>
+                    : <>eTIMS is not enabled. <Link href="/settings/integrations" className="underline font-semibold">Enable it in Integrations →</Link></>
+                  }
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  eTIMS is active. Invoices are {orgSettings.etimsSandbox ? 'submitted in sandbox mode' : 'submitted to KRA in real-time'}.
+                </p>
+                <Link href="/settings/integrations" className="flex items-center gap-1.5 text-xs text-primary hover:underline font-medium">
+                  <Settings className="w-3.5 h-3.5" /> Manage
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
@@ -246,8 +281,8 @@ export default async function TaxCompliancePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(byMonth).map(([month, data]) => {
-                    const filed = filingPeriods.find((p) => p.period === month && p.taxType === 'VAT');
+                  {Object.entries(byMonth).map(([month, data]: [string, any]) => {
+                    const filed = filingPeriods.find((p: any) => p.period === month && p.taxType === 'VAT');
                     return (
                       <tr key={month} className="border-t border-border hover:bg-muted/20 transition-colors">
                         <td className="px-6 py-4 font-semibold text-foreground">{month}</td>
@@ -303,7 +338,7 @@ export default async function TaxCompliancePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filingPeriods.map((fp) => (
+                  {filingPeriods.map((fp: any) => (
                     <tr key={fp.id} className="border-t border-border hover:bg-muted/20">
                       <td className="px-5 py-3.5 font-semibold">{fp.taxType}</td>
                       <td className="px-5 py-3.5 text-muted-foreground">{fp.period}</td>

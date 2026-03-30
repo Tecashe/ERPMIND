@@ -25,6 +25,45 @@ model ModuleConfig {
   updatedAt           DateTime @updatedAt
 }
 
+// ─── ORGANIZATION SETTINGS (Per-tenant — SaaS ready) ──────────────────────────
+
+model OrganizationSettings {
+  id                  String    @id @default(cuid())
+  tenantId            String    @default("default") @unique
+
+  // ── Company Profile ──────────────────────────────────────────────────────────
+  companyName         String    @default("My Company Ltd")
+  kraPin              String?   // e.g. "P051234567M" — KRA PIN Number
+  vatNumber           String?   // KRA VAT Registration Number
+  address             String?
+  city                String    @default("Nairobi")
+  country             String    @default("Kenya")
+  phone               String?
+  email               String?
+  website             String?
+  logoUrl             String?
+  primaryColor        String    @default("#6366f1")
+
+  // ── KRA eTIMS (OSCU) Config ──────────────────────────────────────────────────
+  etimsEnabled        Boolean   @default(false)
+  etimsUrl            String?   // e.g. https://etims-api.kra.go.ke/etims-api
+  etimsDeviceSerial   String?   // VSCU/OSCU device serial from KRA
+  etimsSandbox        Boolean   @default(true)
+  etimsLastTestedAt   DateTime?
+  etimsTestSuccess    Boolean?
+  etimsTestMessage    String?
+
+  // ── M-Pesa STK Push ─────────────────────────────────────────────────────────
+  mpesaEnabled        Boolean   @default(false)
+  mpesaShortcode      String?
+  mpesaConsumerKey    String?
+  mpesaConsumerSecret String?   // stored encrypted in production
+  mpesaPassKey        String?
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
 // ─── CHART OF ACCOUNTS (Double-entry) ─────────────────────────────────────────
 
 model ChartOfAccount {

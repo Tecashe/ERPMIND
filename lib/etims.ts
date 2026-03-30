@@ -1,18 +1,24 @@
 /**
  * KRA eTIMS OSCU Integration Service
- * Supports sandbox and production modes via env vars.
  *
- * Required env vars:
- *   ETIMS_URL          — e.g. https://etims-api.kra.go.ke/etims-api (prod) or sandbox URL
- *   ETIMS_DEVICE_SERIAL — Your registered VSCU/OSCU device serial
- *   ETIMS_KRA_PIN       — Company KRA PIN
+ * Credentials are injected per-call from OrganizationSettings (DB).
+ * Falls back to env vars only as a last resort for backward compatibility.
+ *
+ * Required env vars (platform defaults / sandbox only):
+ *   ETIMS_URL          — e.g. https://etims-sbx.kra.go.ke/etims-api
+ *   ETIMS_DEVICE_SERIAL — sandbox/test device serial
+ *   ETIMS_KRA_PIN       — sandbox/test KRA PIN
  *   ETIMS_SANDBOX       — "true" for sandbox mode
  */
 
-const BASE_URL = process.env.ETIMS_URL ?? 'https://etims-sbx.kra.go.ke/etims-api'
-const DEVICE_SERIAL = process.env.ETIMS_DEVICE_SERIAL ?? 'SANDBOX_DEVICE'
-const KRA_PIN = process.env.ETIMS_KRA_PIN ?? 'P000000000X'
-const IS_SANDBOX = process.env.ETIMS_SANDBOX !== 'false'
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface ETIMSConfig {
+  url: string
+  deviceSerial: string
+  kraPin: string
+  sandbox: boolean
+}
 
 export interface ETIMSInvoicePayload {
   invoiceNumber: string
@@ -48,35 +54,50 @@ export interface ETIMSResponse {
   rawResponse?: unknown
 }
 
-/**
- * Submit an invoice to KRA eTIMS OSCU API
- */
-export async function submitToETIMS(payload: ETIMSInvoicePayload): Promise<ETIMSResponse> {
-  if (IS_SANDBOX) {
-    // Sandbox: simulate a successful eTIMS response
-    await new Promise((r) => setTimeout(r, 500))
+// ─── Default config (env-based, platform sandbox) ────────────────────────────
+
+function getPlatformConfig(): ETIMSConfig {
+  return {
+    url: process.env.ETIMS_URL ?? 'https://etims-sbx.kra.go.ke/etims-api',
+    deviceSerial: process.env.ETIMS_DEVICE_SERIAL ?? 'SANDBOX_DEVICE',
+    kraPin: process.env.ETIMS_KRA_PIN ?? 'P000000000X',
+    sandbox: process.env.ETIMS_SANDBOX !== 'false',
+  }
+}
+
+// ─── Submit invoice to KRA eTIMS ─────────────────────────────────────────────
+
+export async function submitToETIMS(
+  payload: ETIMSInvoicePayload,
+  config?: ETIMSConfig,
+): Promise<ETIMSResponse> {
+  const cfg = config ?? getPlatformConfig()
+
+  if (cfg.sandbox) {
+    // Sandbox: simulate a successful eTIMS response instantly
+    await new Promise((r) => setTimeout(r, 400))
     return {
       success: true,
       cuInvoiceNo: `CU${Date.now()}`,
-      cuSerialNo: DEVICE_SERIAL,
-      qrCode: `https://etims.kra.go.ke/verify?inv=${payload.invoiceNumber}&pin=${KRA_PIN}`,
+      cuSerialNo: cfg.deviceSerial,
+      qrCode: `https://etims.kra.go.ke/verify?inv=${payload.invoiceNumber}&pin=${cfg.kraPin}`,
       timestamp: new Date().toISOString(),
     }
   }
 
   try {
     const body = {
-      deviceSerial: DEVICE_SERIAL,
-      kraPin: KRA_PIN,
+      deviceSerial: cfg.deviceSerial,
+      kraPin: cfg.kraPin,
       ...payload,
     }
 
-    const res = await fetch(`${BASE_URL}/saveItems`, {
+    const res = await fetch(`${cfg.url}/saveItems`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'DeviceSerial': DEVICE_SERIAL,
-        'Pin': KRA_PIN,
+        'DeviceSerial': cfg.deviceSerial,
+        'Pin': cfg.kraPin,
       },
       body: JSON.stringify(body),
     })
@@ -110,18 +131,23 @@ export async function submitToETIMS(payload: ETIMSInvoicePayload): Promise<ETIMS
   }
 }
 
-/**
- * Query invoice status from eTIMS
- */
-export async function queryETIMSStatus(cuInvoiceNo: string): Promise<ETIMSResponse> {
-  if (IS_SANDBOX) {
-    return { success: true, cuInvoiceNo, cuSerialNo: DEVICE_SERIAL }
+// ─── Query invoice status from eTIMS ─────────────────────────────────────────
+
+export async function queryETIMSStatus(
+  cuInvoiceNo: string,
+  config?: ETIMSConfig,
+): Promise<ETIMSResponse> {
+  const cfg = config ?? getPlatformConfig()
+
+  if (cfg.sandbox) {
+    return { success: true, cuInvoiceNo, cuSerialNo: cfg.deviceSerial }
   }
 
   try {
-    const res = await fetch(`${BASE_URL}/selectTrnsSaleList?cuInvoiceNo=${cuInvoiceNo}`, {
-      headers: { 'DeviceSerial': DEVICE_SERIAL, 'Pin': KRA_PIN },
-    })
+    const res = await fetch(
+      `${cfg.url}/selectTrnsSaleList?cuInvoiceNo=${cuInvoiceNo}`,
+      { headers: { 'DeviceSerial': cfg.deviceSerial, 'Pin': cfg.kraPin } },
+    )
     const data = await res.json()
     return { success: res.ok, rawResponse: data }
   } catch (err: unknown) {
@@ -129,9 +155,47 @@ export async function queryETIMSStatus(cuInvoiceNo: string): Promise<ETIMSRespon
   }
 }
 
-/**
- * Build QR code URL for an eTIMS-approved invoice
- */
+// ─── Test eTIMS connection ────────────────────────────────────────────────────
+
+export async function testETIMSConnection(config: ETIMSConfig): Promise<ETIMSResponse> {
+  if (config.sandbox) {
+    await new Promise((r) => setTimeout(r, 600))
+    return {
+      success: true,
+      cuSerialNo: config.deviceSerial,
+      errorMessage: 'Sandbox mode — connection simulated successfully',
+    }
+  }
+
+  try {
+    const res = await fetch(`${config.url}/selectInitOsdcInfo`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'DeviceSerial': config.deviceSerial,
+        'Pin': config.kraPin,
+      },
+      body: JSON.stringify({ deviceSerial: config.deviceSerial, kraPin: config.kraPin }),
+    })
+    const data = await res.json()
+    return {
+      success: res.ok && data.resultCd === '000',
+      cuSerialNo: data.data?.cuSn,
+      errorCode: data.resultCd,
+      errorMessage: data.resultMsg,
+      rawResponse: data,
+    }
+  } catch (err: unknown) {
+    return {
+      success: false,
+      errorCode: 'NETWORK_ERROR',
+      errorMessage: err instanceof Error ? err.message : 'Could not reach KRA eTIMS',
+    }
+  }
+}
+
+// ─── Build QR code URL ────────────────────────────────────────────────────────
+
 export function buildQRCodeUrl(cuInvoiceNo: string, kraPin: string): string {
   return `https://etims.kra.go.ke/verify?inv=${cuInvoiceNo}&pin=${kraPin}`
 }

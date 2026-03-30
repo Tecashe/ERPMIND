@@ -3,12 +3,9 @@
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { computeKenyaPayroll } from '@/lib/kenya-tax'
-import { submitToETIMS, type ETIMSInvoicePayload } from '@/lib/etims'
+import { submitToETIMS, testETIMSConnection as _testETIMSConnection, type ETIMSInvoicePayload, type ETIMSConfig } from '@/lib/etims'
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
-
-const KRA_PIN = process.env.ETIMS_KRA_PIN ?? 'P000000000X'
-const COMPANY_NAME = process.env.COMPANY_NAME ?? 'My Company Ltd'
 
 function revalidateAccounting() {
   revalidatePath('/finance')
@@ -222,16 +219,32 @@ export async function createInvoice(data: {
 }
 
 export async function submitInvoiceToETIMS(invoiceId: string) {
-  const invoice = await prisma.invoice.findUniqueOrThrow({
-    where: { id: invoiceId },
-    include: { customer: true, lineItems: { include: { taxRate: true } } },
-  })
+  const [invoice, orgSettings] = await Promise.all([
+    prisma.invoice.findUniqueOrThrow({
+      where: { id: invoiceId },
+      include: { customer: true, lineItems: { include: { taxRate: true } } },
+    }),
+    prisma.organizationSettings.findUnique({ where: { tenantId: 'default' } }),
+  ])
+
+  // Build per-tenant eTIMS config from DB (falls back gracefully if not configured)
+  const etimsConfig: ETIMSConfig | undefined = orgSettings?.etimsEnabled
+    ? {
+        url: orgSettings.etimsUrl ?? 'https://etims-sbx.kra.go.ke/etims-api',
+        deviceSerial: orgSettings.etimsDeviceSerial ?? 'SANDBOX_DEVICE',
+        kraPin: orgSettings.kraPin ?? 'P000000000X',
+        sandbox: orgSettings.etimsSandbox,
+      }
+    : undefined
+
+  const companyName = orgSettings?.companyName ?? 'My Company Ltd'
+  const kraPin = orgSettings?.kraPin ?? 'P000000000X'
 
   const payload: ETIMSInvoicePayload = {
     invoiceNumber: invoice.invoiceNumber,
     invoiceDate: invoice.issueDate.toISOString().replace('T', ' ').slice(0, 19),
-    supplierPin: KRA_PIN,
-    supplierName: COMPANY_NAME,
+    supplierPin: kraPin,
+    supplierName: companyName,
     buyerPin: invoice.customerPin ?? undefined,
     buyerName: invoice.customerName ?? invoice.customer?.name,
     currency: invoice.currency,
@@ -250,7 +263,7 @@ export async function submitInvoiceToETIMS(invoiceId: string) {
     })),
   }
 
-  const result = await submitToETIMS(payload)
+  const result = await submitToETIMS(payload, etimsConfig)
 
   // Log the submission
   await prisma.eTIMSLog.create({
@@ -696,6 +709,95 @@ export async function getAccountingDashboard() {
     overdueInvoices, overdueBills,
     totalBankBalance, bankAccounts,
     pendingETIMS, recentJournals,
+  }
+}
+
+// ─── ORGANIZATION SETTINGS ───────────────────────────────────────────────────
+
+export async function getOrganizationSettings() {
+  return prisma.organizationSettings.upsert({
+    where: { tenantId: 'default' },
+    create: { tenantId: 'default' },
+    update: {},
+  })
+}
+
+export async function saveOrganizationSettings(data: {
+  companyName?: string
+  kraPin?: string
+  vatNumber?: string
+  address?: string
+  city?: string
+  country?: string
+  phone?: string
+  email?: string
+  website?: string
+  logoUrl?: string
+}) {
+  await prisma.organizationSettings.upsert({
+    where: { tenantId: 'default' },
+    create: { tenantId: 'default', ...data },
+    update: data,
+  })
+  revalidatePath('/settings/organization')
+  revalidatePath('/finance/tax')
+}
+
+export async function saveETIMSSettings(data: {
+  etimsEnabled: boolean
+  etimsUrl?: string
+  etimsDeviceSerial?: string
+  etimsSandbox: boolean
+  kraPin?: string
+}) {
+  await prisma.organizationSettings.upsert({
+    where: { tenantId: 'default' },
+    create: { tenantId: 'default', ...data },
+    update: data,
+  })
+  revalidatePath('/settings/integrations')
+  revalidatePath('/finance/tax')
+}
+
+export async function testETIMSConnectionFromSettings(): Promise<{
+  success: boolean
+  message: string
+}> {
+  const settings = await prisma.organizationSettings.findUnique({
+    where: { tenantId: 'default' },
+  })
+
+  if (!settings?.etimsEnabled) {
+    return { success: false, message: 'eTIMS is not enabled. Enable it in Integration Settings first.' }
+  }
+
+  const config: ETIMSConfig = {
+    url: settings.etimsUrl ?? 'https://etims-sbx.kra.go.ke/etims-api',
+    deviceSerial: settings.etimsDeviceSerial ?? 'SANDBOX_DEVICE',
+    kraPin: settings.kraPin ?? 'P000000000X',
+    sandbox: settings.etimsSandbox,
+  }
+
+  const result = await _testETIMSConnection(config)
+
+  // Persist test result
+  await prisma.organizationSettings.update({
+    where: { tenantId: 'default' },
+    data: {
+      etimsLastTestedAt: new Date(),
+      etimsTestSuccess: result.success,
+      etimsTestMessage: result.success
+        ? (settings.etimsSandbox ? 'Sandbox connection OK' : 'Production connection OK')
+        : (result.errorMessage ?? 'Connection failed'),
+    },
+  })
+
+  revalidatePath('/settings/integrations')
+  return {
+    success: result.success,
+    message: result.success
+      ? (settings.etimsSandbox ? '✓ Sandbox mode — connection simulated successfully' : '✓ Connected to KRA eTIMS production')
+      : `✗ ${result.errorMessage ?? 'Connection failed'}`,
   }
 }
 

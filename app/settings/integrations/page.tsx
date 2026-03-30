@@ -1,21 +1,42 @@
-import React from "react";
-import { DashboardLayout } from "@/components/dashboard-layout";
-import { Construction } from "lucide-react";
+import { DashboardLayout } from '@/components/dashboard-layout'
+import { Zap } from 'lucide-react'
+import { getOrganizationSettings } from '@/app/actions/accounting'
+import { IntegrationsForm } from './_form'
 
-export default function Page() {
+export default async function IntegrationsSettingsPage() {
+  const settings = await getOrganizationSettings()
+
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">Integration Settings</h1>
-          <p className="text-muted-foreground">Settings Module Workspace</p>
+          <div className="flex items-center gap-3 mb-1">
+            <div className="p-2.5 rounded-xl bg-primary/10">
+              <Zap className="w-7 h-7 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground tracking-tight">Integrations</h1>
+              <p className="text-muted-foreground text-sm">Connect your ERP to KRA eTIMS, M-Pesa, and other services</p>
+            </div>
+          </div>
         </div>
-        <div className="card-premium p-12 text-center border border-dashed border-border">
-          <Construction className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-foreground mb-2">Coming Soon</h2>
-          <p className="text-muted-foreground max-w-md mx-auto">Integration Settings features are being built out in the next schema expansion.</p>
-        </div>
+
+        <IntegrationsForm
+          initial={{
+            kraPin: settings.kraPin,
+            etimsEnabled: settings.etimsEnabled,
+            etimsUrl: settings.etimsUrl,
+            etimsDeviceSerial: settings.etimsDeviceSerial,
+            etimsSandbox: settings.etimsSandbox,
+            etimsLastTestedAt: settings.etimsLastTestedAt,
+            etimsTestSuccess: settings.etimsTestSuccess,
+            etimsTestMessage: settings.etimsTestMessage,
+            mpesaEnabled: settings.mpesaEnabled,
+          }}
+        />
       </div>
     </DashboardLayout>
-  );
+  )
 }
