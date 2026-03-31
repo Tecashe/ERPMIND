@@ -227,6 +227,7 @@ const NAV_ITEMS: NavItem[] = [
     icon: <TrendingUp className="w-5 h-5" />,
     href: '/sales',
     subitems: [
+      { name: 'Point of Sale (POS)', href: '/pos' },
       { name: 'Quotations', href: '/sales/quotations' },
       { name: 'Sales Orders', href: '/sales/orders' },
       { name: 'Deliveries', href: '/sales/deliveries' },
