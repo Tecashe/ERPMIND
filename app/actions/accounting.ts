@@ -295,6 +295,43 @@ export async function submitInvoiceToETIMS(invoiceId: string) {
   return result
 }
 
+// ─── API KEYS (Integrations) ──────────────────────────────────────────────────
+
+export async function getApiKeys() {
+  return prisma.apiKey.findMany({
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+export async function createApiKey(data: { name: string; permission: string }) {
+  // Generate a secure key that looks premium (e.g. nx_live_28dj3jhf...)
+  const prefix = 'nx_live_'
+  const secureRandom = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '').slice(0, 16)
+  const keyString = prefix + secureRandom
+
+  await prisma.apiKey.create({
+    data: {
+      name: data.name,
+      permission: data.permission,
+      keyString,
+    },
+  })
+  
+  revalidatePath('/settings/integrations')
+  revalidatePath('/settings/integrations/api-keys')
+  
+  return keyString // Only return once explicitly to be shown to user!
+}
+
+export async function revokeApiKey(id: string) {
+  await prisma.apiKey.update({
+    where: { id },
+    data: { isActive: false },
+  })
+  revalidatePath('/settings/integrations')
+  revalidatePath('/settings/integrations/api-keys')
+}
+
 export async function markInvoicePaid(invoiceId: string, data: {
   amount: number
   paymentMethod: string

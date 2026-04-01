@@ -1,5 +1,6 @@
 import { DashboardLayout } from '@/components/dashboard-layout'
-import { Zap } from 'lucide-react'
+import { Zap, KeyRound } from 'lucide-react'
+import Link from 'next/link'
 import { getOrganizationSettings } from '@/app/actions/accounting'
 import { IntegrationsForm } from './_form'
 
@@ -21,6 +22,19 @@ export default async function IntegrationsSettingsPage() {
               <p className="text-muted-foreground text-sm">Connect your ERP to KRA eTIMS, M-Pesa, and other services</p>
             </div>
           </div>
+        </div>
+
+        {/* API Keys Banner */}
+        <div className="mb-6 card-premium p-6 border border-primary/20 bg-primary/5 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-primary" /> Open API Integrations
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">Manage API Keys to connect external software (Shopify, Custom POS) directly to your ERP sales engine.</p>
+          </div>
+          <Link href="/settings/integrations/api-keys" className="px-5 py-2.5 bg-foreground text-background font-semibold rounded-lg hover:bg-foreground/90 transition-all shadow-sm text-sm shrink-0 whitespace-nowrap">
+            Manage API Keys
+          </Link>
         </div>
 
         <IntegrationsForm

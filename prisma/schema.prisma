@@ -605,3 +605,16 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+// ─── EXTERNAL OPEN API ────────────────────────────────────────────────────────
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  name        String
+  keyString   String    @unique
+  isActive    Boolean   @default(true)
+  permission  String    @default("WRITE_ONLY") // WRITE_ONLY, READ_WRITE
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
