@@ -132,6 +132,38 @@ export async function createProduct(data: {
   revalidatePath('/dashboard')
 }
 
+export async function bulkImportProducts(
+  products: { name: string; sku: string; priceKES: number; stockLevel: number; lowStockAlert: number }[],
+  strategy: 'skip' | 'overwrite'
+) {
+  // Prisma doesn't have a single `upsertMany`. We use a transaction to safely handle the chosen strategy.
+  await prisma.$transaction(async (tx) => {
+    for (const p of products) {
+      if (strategy === 'skip') {
+        const existing = await tx.product.findUnique({ where: { sku: p.sku } })
+        if (!existing) {
+          await tx.product.create({ data: p })
+        }
+      } else if (strategy === 'overwrite') {
+        await tx.product.upsert({
+          where: { sku: p.sku },
+          update: {
+            name: p.name,
+            priceKES: p.priceKES,
+            stockLevel: p.stockLevel,
+            lowStockAlert: p.lowStockAlert,
+          },
+          create: p,
+        })
+      }
+    }
+  })
+
+  revalidatePath('/inventory')
+  revalidatePath('/dashboard')
+  revalidatePath('/pos')
+}
+
 export async function updateProduct(id: string, data: {
   name?: string
   priceKES?: number

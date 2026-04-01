@@ -2,6 +2,7 @@ import React from 'react';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { Package, AlertTriangle, TrendingDown } from 'lucide-react';
 import { getProducts, getRawMaterials } from '@/app/actions';
+import { BulkImportTrigger } from '@/components/inventory/bulk-import-trigger';
 
 export default async function StockTrackingPage() {
   const [products, rawMaterials] = await Promise.all([
@@ -15,9 +16,12 @@ export default async function StockTrackingPage() {
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">Stock Tracking</h1>
-          <p className="text-muted-foreground">Live inventory levels — updated automatically by Sales and Production modules.</p>
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">Stock Tracking</h1>
+            <p className="text-muted-foreground">Live inventory levels — updated automatically by Sales and Production modules.</p>
+          </div>
+          <BulkImportTrigger />
         </div>
 
         {/* Alerts */}
