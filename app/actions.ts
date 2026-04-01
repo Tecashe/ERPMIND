@@ -159,9 +159,9 @@ export async function bulkImportProducts(
     }
   })
 
-  revalidatePath('/inventory')
-  revalidatePath('/dashboard')
+  revalidatePath('/inventory/tracking')
   revalidatePath('/pos')
+  revalidatePath('/dashboard')
 }
 
 export async function updateProduct(id: string, data: {

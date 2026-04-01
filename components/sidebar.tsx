@@ -323,6 +323,7 @@ const NAV_ITEMS: NavItem[] = [
       { name: 'Users & Roles', href: '/settings/users' },
       { name: 'Modules & Subscriptions', href: '/settings/modules' },
       { name: 'Integration Settings', href: '/settings/integrations' },
+      { name: 'API Keys', href: '/settings/integrations/api-keys' },
     ],
   },
 ];

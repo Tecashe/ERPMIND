@@ -49,11 +49,23 @@ export function BulkImportModal({ onClose }: { onClose: () => void }) {
     }
   }
 
-  const parseCSVLine = (line: string) => {
-    // Basic CSV parser handling quotes
-    const regex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g
-    const matches = line.match(regex) || []
-    return matches.map(m => m.replace(/^"|"$/g, '').trim())
+  const parseCSVLine = (text: string) => {
+    const result = [];
+    let cur = '';
+    let inQuote = false;
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (char === '"') {
+        inQuote = !inQuote;
+      } else if (char === ',' && !inQuote) {
+        result.push(cur.trim());
+        cur = '';
+      } else {
+        cur += char;
+      }
+    }
+    result.push(cur.trim());
+    return result.map(s => s.replace(/^"|"$/g, '').trim());
   }
 
   const handleSubmit = async () => {
